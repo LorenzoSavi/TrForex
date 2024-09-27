@@ -23,8 +23,11 @@ Con l'app **TrForex**, i giovani investitori che desiderano entrare nel mondo az
 
 1. un esempio di richiesta risposta API può essere la richiesta di una certa quotazione , per esempio EURUSD , e la risposta del minimo e massimo giornaliero
    in input
+
   {
+
   	charm : "EURUSD"
+   
   }
 
  ![output della richiesta](img/ReadmeImage1.png)
