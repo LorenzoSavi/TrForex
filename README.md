@@ -27,37 +27,7 @@ Con l'app **TrForex**, i giovani investitori che desiderano entrare nel mondo az
   	charm : "EURUSD"
   }
 
-  output 
- {
-    "charm": "EURUSD",
-    "data": [
-        {
-            "data": "2024-09-26",
-            "massimo": 1.0750,
-            "minimo": 1.0700
-        },
-        {
-            "data": "2024-09-25",
-            "massimo": 1.0745,
-            "minimo": 1.0695
-        },
-        {
-            "data": "2024-09-24",
-            "massimo": 1.0730,
-            "minimo": 1.0680
-        },
-        {
-            "data": "2024-09-23",
-            "massimo": 1.0720,
-            "minimo": 1.0670
-        },
-        {
-            "data": "2024-09-22",
-            "massimo": 1.0710,
-            "minimo": 1.0660
-        }
-    ]
-}
+ ![output della richiesta](img/ReadmeImage1.PNG)
 
 
 ## Contribuire
