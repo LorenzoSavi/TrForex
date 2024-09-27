@@ -19,6 +19,46 @@ Con l'app **TrForex**, i giovani investitori che desiderano entrare nel mondo az
 2. Crea il tuo conto demo.
 3. Inizia a esplorare le opportunità di trading in Forex e azioni.
 
+## Esempio di richiesta API
+
+1. un esempio di richiesta risposta API può essere la richiesta di una certa quotazione , per esempio EURUSD , e la risposta del minimo e massimo giornaliero
+   in input
+  {
+  	charm : "EURUSD"
+  }
+
+  output 
+  {
+      "charm": "EURUSD",
+      "data": [
+          {
+              "data": "2024-09-26",
+              "massimo": 1.0750,
+              "minimo": 1.0700
+          },
+          {
+              "data": "2024-09-25",
+              "massimo": 1.0745,
+              "minimo": 1.0695
+          },
+          {
+              "data": "2024-09-24",
+              "massimo": 1.0730,
+              "minimo": 1.0680
+          },
+          {
+              "data": "2024-09-23",
+              "massimo": 1.0720,
+              "minimo": 1.0670
+          },
+          {
+              "data": "2024-09-22",
+              "massimo": 1.0710,
+              "minimo": 1.0660
+          }
+      ]
+  }  
+
 ## Contribuire
 
 Se desideri contribuire al progetto, sei il benvenuto! Puoi segnalare bug, proporre nuove funzionalità o migliorare la documentazione. Per favore, apri una pull request o crea un issue.
