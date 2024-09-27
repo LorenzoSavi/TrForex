@@ -27,7 +27,7 @@ Con l'app **TrForex**, i giovani investitori che desiderano entrare nel mondo az
   	charm : "EURUSD"
   }
 
- ![output della richiesta](img/ReadmeImage1.PNG)
+ ![output della richiesta](img/ReadmeImage1.png)
 
 
 ## Contribuire
