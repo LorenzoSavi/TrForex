@@ -16,6 +16,20 @@ Con l'app **TrForex**, i giovani investitori che desiderano entrare nel mondo az
 - **Gestione della FOMO**: Strumenti e consigli per aiutarti a prendere decisioni più consapevoli.
 
 
+## Come Iniziare
+
+1. Scarica l'app TrForex.
+2. Crea il tuo conto demo.
+3. Inizia a esplorare le opportunità di trading in Forex e azioni.
+
+
+## Competitor 
+
+I principali competitor che offrono funzionalità identiche al mio progetto sono MetaTrader 4, MetaTrader 5, XMtrade, FXTM, OctaFX ed eToro. 
+Come la mia piattaforma, consentono di creare un account demo per imparare a investire. Tuttavia, a differenza del mio progetto, 
+permettono anche di aprire conti reali, supportati da istituzioni bancarie e con costi associati.
+
+
 # Requisiti del Progetto di Trading con Conto Demo
 
 ## Requisiti di Dominio
@@ -42,13 +56,6 @@ Con l'app **TrForex**, i giovani investitori che desiderano entrare nel mondo az
 ![Diagramma UML](https://yuml.me/13f17daa.svg)
 
 
-## Come Iniziare
-
-1. Scarica l'app TrForex.
-2. Crea il tuo conto demo.
-3. Inizia a esplorare le opportunità di trading in Forex e azioni.
-
-
 ## Esempio di richiesta API
 
 1. un esempio di richiesta risposta API può essere la richiesta di una certa quotazione , per esempio EURUSD , e la risposta del minimo e massimo giornaliero
@@ -57,13 +64,6 @@ Con l'app **TrForex**, i giovani investitori che desiderano entrare nel mondo az
   	charm : "EURUSD"
 
  ![output della richiesta](img/ReadmeImage1.png)
-
-
-## Competitor 
-
-I principali competitor che offrono funzionalità identiche al mio progetto sono MetaTrader 4, MetaTrader 5, XMtrade, FXTM, OctaFX ed eToro. 
-Come la mia piattaforma, consentono di creare un account demo per imparare a investire. Tuttavia, a differenza del mio progetto, 
-permettono anche di aprire conti reali, supportati da istituzioni bancarie e con costi associati.
 
 
 ## Contribuire
