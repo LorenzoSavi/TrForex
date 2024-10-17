@@ -59,6 +59,13 @@ Con l'app **TrForex**, i giovani investitori che desiderano entrare nel mondo az
  ![output della richiesta](img/ReadmeImage1.png)
 
 
+## Competitor 
+
+I principali competitor che offrono funzionalità identiche al mio progetto sono MetaTrader 4, MetaTrader 5, XMtrade, FXTM, OctaFX ed eToro. 
+Come la mia piattaforma, consentono di creare un account demo per imparare a investire. Tuttavia, a differenza del mio progetto, 
+permettono anche di aprire conti reali, supportati da istituzioni bancarie e con costi associati.
+
+
 ## Contribuire
 
 Se desideri contribuire al progetto, sei il benvenuto! Puoi segnalare bug, proporre nuove funzionalità o migliorare la documentazione. Per favore, apri una pull request o crea un issue.
