@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forex</title>
     <link rel="stylesheet" href="forex-styles.css"> <!-- Percorso relativo -->
 </head>
+
 <body>
     <div class="sidebar">
         <img id="profile-img" src="img/default.png" alt="Profile Picture"> <!-- Percorso relativo a img -->
         <p id="username"></p>
         <p id="capital"></p>
-        
+
         <ul id="currency-list">
             <li>EUR/USD</li>
             <li>GBP/USD</li>
@@ -25,8 +27,13 @@
         <canvas id="forex-chart"></canvas>
     </div>
 
+    <!-- Chart.js e adattatore di date fns -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
     <script>
-        window.onload = function() {
+        window.onload = function () {
             // Prendi username e capitale da localStorage (modificabile come preferisci)
             const username = localStorage.getItem('username') || "Utente";
             const capital = localStorage.getItem('capital') || "€10000";
@@ -36,13 +43,76 @@
 
             // Array di immagini disponibili
             const images = ['img1.png', 'img2.png', 'img3.png'];
-            
+
             // Prendi un'immagine casuale
             const randomImage = images[Math.floor(Math.random() * images.length)];
 
             // Imposta l'immagine del profilo con il percorso corretto
             document.getElementById('profile-img').src = `img/${randomImage}`;  // Percorso relativo
         };
+
+
+        const currencyList = document.getElementById('currency-list');
+        const ctx = document.getElementById('forex-chart').getContext('2d');
+        let candleChart;
+
+        // Funzione per aggiornare il grafico
+        function updateChart(data) {
+            if (candleChart) {
+                candleChart.destroy();  // Rimuove il grafico precedente
+            }
+
+            candleChart = new Chart(ctx, {
+                type: 'candlestick',
+                data: {
+                    datasets: [{
+                        label: 'Forex Data',
+                        data: data,  // I dati devono avere proprietà t, o, h, l, c
+                        borderColor: 'green'
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Funzione per ottenere i dati dal server
+        function fetchForexData(valuta) {
+            fetch('/get-forex-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ valuta })
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        updateChart(result.data);
+                    } else {
+                        alert(result.message);
+                    }
+                })
+                .catch(error => console.error('Errore:', error));
+        }
+
+        // Aggiungi listener agli elementi della lista
+        currencyList.addEventListener('click', function (e) {
+            if (e.target.tagName === 'LI') {
+                const selectedCurrency = e.target.textContent;
+                document.getElementById('currency-title').textContent = selectedCurrency;
+                fetchForexData(selectedCurrency);  // Ottieni e aggiorna il grafico per la valuta selezionata
+            }
+        });
     </script>
 </body>
+
 </html>
