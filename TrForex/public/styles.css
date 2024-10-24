@@ -1,0 +1,105 @@
+/* Stili globali */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.container {
+    background-color: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.container:hover {
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+input:focus, select:focus {
+    border-color: #74ebd5;
+    outline: none;
+    box-shadow: 0 0 8px rgba(116, 235, 213, 0.5);
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #74ebd5;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #ACB6E5;
+}
+
+button:active {
+    background-color: #74ebd5;
+    transform: translateY(2px);
+}
+
+p {
+    margin-top: 20px;
+    color: #555;
+}
+
+a {
+    color: #74ebd5;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #ACB6E5;
+}
+
+/* Transizione tra login e registrazione */
+#register-form {
+    display: none;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Stili responsive per schermi piccoli */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+}

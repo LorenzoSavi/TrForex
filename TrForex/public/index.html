@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div id="login-form">
+            <h2>Login</h2>
+            <input type="email" id="email-login" placeholder="Email" required>
+            <input type="password" id="password-login" placeholder="Password" required>
+            <button onclick="login()">Accedi</button>
+            <p>Non hai un account? <a href="#" onclick="showRegister()">Registrati</a></p>
+        </div>
+
+        <div id="register-form" style="display: none;">
+            <h2>Registrazione</h2>
+            <input type="text" id="nome" placeholder="Nome" required>
+            <input type="text" id="cognome" placeholder="Cognome" required>
+            <input type="email" id="email-register" placeholder="Email" required>
+            <select id="capitale">
+                <option value="150">150</option>
+                <option value="1000">1000</option>
+                <option value="2500">2500</option>
+                <option value="5000">5000</option>
+            </select>
+            <input type="password" id="password-register" placeholder="Password" required>
+            <button onclick="register()">Registrati</button>
+            <p>Hai già un account? <a href="#" onclick="showLogin()">Accedi</a></p>
+        </div>
+    </div>
+
+    <script src="/scripts.js"></script>
+</body>
+</html>

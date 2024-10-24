@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forex</title>
+    <link rel="stylesheet" href="forex-styles.css"> <!-- Percorso relativo -->
+</head>
+<body>
+    <div class="sidebar">
+        <img id="profile-img" src="img/default.png" alt="Profile Picture"> <!-- Percorso relativo a img -->
+        <p id="username"></p>
+        <p id="capital"></p>
+        
+        <ul id="currency-list">
+            <li>EUR/USD</li>
+            <li>GBP/USD</li>
+            <li>USD/JPY</li>
+            <li>...</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h2 id="currency-title">EUR/USD</h2>
+        <canvas id="forex-chart"></canvas>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // Prendi username e capitale da localStorage (modificabile come preferisci)
+            const username = localStorage.getItem('username') || "Utente";
+            const capital = localStorage.getItem('capital') || "€10000";
+
+            document.getElementById('username').textContent = username;
+            document.getElementById('capital').textContent = capital;
+
+            // Array di immagini disponibili
+            const images = ['img1.png', 'img2.png', 'img3.png'];
+            
+            // Prendi un'immagine casuale
+            const randomImage = images[Math.floor(Math.random() * images.length)];
+
+            // Imposta l'immagine del profilo con il percorso corretto
+            document.getElementById('profile-img').src = `img/${randomImage}`;  // Percorso relativo
+        };
+    </script>
+</body>
+</html>
