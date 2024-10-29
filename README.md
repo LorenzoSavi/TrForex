@@ -46,7 +46,7 @@ permettono anche di aprire conti reali, supportati da istituzioni bancarie e con
 2. **Performance**: Il sistema deve rispondere in tempi rapidi alle azioni degli utenti, come la verifica del saldo e l'inserimento di ordini.
 3. **Usabilità**: L'interfaccia deve essere intuitiva, facilitando la gestione degli ordini e la consultazione della cronologia.
 
-![Diagramma UML](https://yuml.me/13f17daa.svg)
+![Diagramma UML](img/uml.png)
 
 
 ## Esempio di richiesta API
