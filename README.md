@@ -6,7 +6,8 @@ Impara a gestire la FOMO da trader a costo zero
 ## Descrizione
 
 Con l'app **TrForex**, i giovani investitori che desiderano entrare nel mondo azionario possono creare un conto demo per aprire posizioni in Forex e comprare azioni, senza rischiare il proprio capitale. TrForex è progettata per aiutarti a sviluppare le tue competenze di trading e a gestire la paura di perdere opportunità (FOMO).
-
+- **Target**: Piccoli investitori,
+- **Problema che risolve**: Imparare ad investire in azioni
 
 ## Caratteristiche
 
