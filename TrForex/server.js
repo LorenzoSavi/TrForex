@@ -6,7 +6,6 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
-// Connessione ai database
 const userDbPath = path.resolve(__dirname, 'database-user.db');
 const forexDbPath = path.resolve(__dirname, 'database-forex.db');
 
@@ -24,7 +23,6 @@ const forexDb = new sqlite3.Database(forexDbPath, (err) => {
     } else {
         console.log('Connesso al database Forex SQLite.');
 
-        // Creazione della tabella "forex" se non esiste
         forexDb.run(`
             CREATE TABLE IF NOT EXISTS forex (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,35 +41,42 @@ const forexDb = new sqlite3.Database(forexDbPath, (err) => {
     }
 });
 
-// Middleware per il parsing del body
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Servire file statici
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Endpoint per la registrazione
 app.post('/register', (req, res) => {
     const { nome, cognome, email, capitale, password } = req.body;
 
-    // Validazione dei dati
     if (!nome || !cognome || !email || !capitale || !password) {
         return res.status(400).json({ success: false, message: 'Compila tutti i campi' });
     }
 
-    // Inserimento dei dati nel database degli utenti
-    const query = "INSERT INTO users (nome, cognome, email, capitale, password) VALUES (?, ?, ?, ?, ?)";
-    userDb.run(query, [nome, cognome, email, capitale, password], (err) => {
+    const checkQuery = "SELECT * FROM users WHERE email = ?";
+    userDb.get(checkQuery, [email], (err, user) => {
         if (err) {
-            console.error('Errore durante l\'inserimento nel database utenti:', err.message);
+            console.error('Errore durante il controllo dell\'email:', err.message);
             return res.status(500).json({ success: false, message: 'Errore del server' });
-        } else {
-            return res.json({ success: true, message: 'Registrazione avvenuta con successo!' });
         }
+
+        if (user) {
+            return res.status(409).json({ success: false, message: 'Email già registrata' });
+        }
+
+        const insertQuery = "INSERT INTO users (nome, cognome, email, capitale, password) VALUES (?, ?, ?, ?, ?)";
+        userDb.run(insertQuery, [nome, cognome, email, capitale, password], (err) => {
+            if (err) {
+                console.error('Errore durante l\'inserimento nel database utenti:', err.message);
+                return res.status(500).json({ success: false, message: 'Errore del server' });
+            } else {
+                return res.json({ success: true, message: 'Registrazione avvenuta con successo!' });
+            }
+        });
     });
 });
 
-// Endpoint per ottenere i dati Forex
+
 app.post('/get-forex-data', (req, res) => {
     const { valuta } = req.body;
 
@@ -86,13 +91,12 @@ app.post('/get-forex-data', (req, res) => {
             return res.status(404).json({ success: false, message: 'Dati non trovati' });
         }
 
-        // Trasforma i dati in un formato utile per il grafico a candele
         const formattedData = rows.map(row => ({
-            giorno: row.giorno,  // data
-            open: row.open,    // valore di apertura
-            massimo: row.massimo, // massimo
-            minimo: row.minimo,  // minimo
-            close: row.close    // valore di chiusura
+            giorno: row.giorno,  
+            open: row.open,    
+            massimo: row.massimo,
+            minimo: row.minimo,  
+            close: row.close    
         }));
 
         res.json({ success: true, data: formattedData });
@@ -100,7 +104,6 @@ app.post('/get-forex-data', (req, res) => {
 });
 
 
-// Endpoint per il login
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
@@ -123,11 +126,9 @@ app.post('/login', (req, res) => {
     });
 });
 
-// Endpoint per ottenere i dati dell'utente dopo il login
 app.post('/get-user-data', (req, res) => {
     const { email } = req.body;
 
-    // Query per ottenere i dati dell'utente
     const query = "SELECT nome, capitale FROM users WHERE email = ?";
     userDb.get(query, [email], (err, user) => {
         if (err) {
@@ -179,7 +180,6 @@ app.get('/list-forex', (req, res) => {
 });
 
 
-// Reindirizzamento a forex.html dopo il login
 app.get('/forex', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'forex.html'));
 });
