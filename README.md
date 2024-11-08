@@ -62,7 +62,8 @@ permettono anche di aprire conti reali, supportati da istituzioni bancarie e con
 ## Come Iniziare
 
 1. Scarica l'app TrForex.
-2. Crea il tuo conto demo.
-3. Inizia a esplorare le opportunità di trading in Forex e azioni.
+2. installa i pacchetti e avvia l'app.
+3. Crea il tuo conto demo.
+4. Inizia a esplorare le opportunità di trading in Forex e azioni.
 
 
