@@ -179,6 +179,30 @@ app.get('/list-forex', (req, res) => {
     });
 });
 
+app.get('/forex/filter/:valuta', (req, res) => {
+    let { valuta } = req.params;
+
+    valuta = unescape(valuta);
+
+    if (!valuta) {
+        return res.status(400).json({ success: false, message: 'Parametro valuta mancante' });
+    }
+
+    const query = "SELECT * FROM forex WHERE valuta = ?";
+    forexDb.all(query, [valuta], (err, rows) => {
+        if (err) {
+            console.error('Errore durante il recupero dei dati filtrati:', err.message);
+            return res.status(500).json({ success: false, message: 'Errore del server' });
+        }
+
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Nessun dato trovato per questa valuta' });
+        }
+
+        res.json({ success: true, data: rows });
+    });
+});
+
 
 app.get('/forex', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'forex.html'));

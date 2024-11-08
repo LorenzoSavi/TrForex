@@ -5,12 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forex</title>
-    <link rel="stylesheet" href="forex-styles.css"> <!-- Percorso relativo -->
+    <link rel="stylesheet" href="forex-styles.css"> 
 </head>
 
 <body>
     <div class="sidebar">
-        <img id="profile-img" src="img/default.png" alt="Profile Picture"> <!-- Percorso relativo a img -->
+        <img id="profile-img" src="img/default.png" alt="Profile Picture"> 
         <p id="username"></p>
         <p id="capital"></p>
 
@@ -18,7 +18,6 @@
             <li>EUR/USD</li>
             <li>GBP/USD</li>
             <li>USD/JPY</li>
-            <li>...</li>
         </ul>
     </div>
 
@@ -27,28 +26,23 @@
         <canvas id="forex-chart"></canvas>
     </div>
 
-    <!-- Chart.js e adattatore di date fns -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 
     <script>
         window.onload = function () {
-            // Prendi username e capitale da localStorage (modificabile come preferisci)
             const username = localStorage.getItem('username') || "Utente";
             const capital = localStorage.getItem('capital') || "€10000";
 
             document.getElementById('username').textContent = username;
             document.getElementById('capital').textContent = capital;
 
-            // Array di immagini disponibili
             const images = ['img1.png', 'img2.png', 'img3.png'];
 
-            // Prendi un'immagine casuale
             const randomImage = images[Math.floor(Math.random() * images.length)];
 
-            // Imposta l'immagine del profilo con il percorso corretto
-            document.getElementById('profile-img').src = `img/${randomImage}`;  // Percorso relativo
+            document.getElementById('profile-img').src = `img/${randomImage}`; 
         };
 
 
@@ -56,10 +50,9 @@
         const ctx = document.getElementById('forex-chart').getContext('2d');
         let candleChart;
 
-        // Funzione per aggiornare il grafico
         function updateChart(data) {
             if (candleChart) {
-                candleChart.destroy();  // Rimuove il grafico precedente
+                candleChart.destroy();  
             }
 
             candleChart = new Chart(ctx, {
@@ -67,7 +60,7 @@
                 data: {
                     datasets: [{
                         label: 'Forex Data',
-                        data: data,  // I dati devono avere proprietà t, o, h, l, c
+                        data: data,  
                         borderColor: 'green'
                     }]
                 },
@@ -84,7 +77,6 @@
             });
         }
 
-        // Funzione per ottenere i dati dal server
         function fetchForexData(valuta) {
             fetch('/get-forex-data', {
                 method: 'POST',
@@ -104,12 +96,11 @@
                 .catch(error => console.error('Errore:', error));
         }
 
-        // Aggiungi listener agli elementi della lista
         currencyList.addEventListener('click', function (e) {
             if (e.target.tagName === 'LI') {
                 const selectedCurrency = e.target.textContent;
                 document.getElementById('currency-title').textContent = selectedCurrency;
-                fetchForexData(selectedCurrency);  // Ottieni e aggiorna il grafico per la valuta selezionata
+                fetchForexData(selectedCurrency);  
             }
         });
     </script>
