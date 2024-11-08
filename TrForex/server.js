@@ -142,6 +142,43 @@ app.post('/get-user-data', (req, res) => {
     });
 });
 
+
+
+app.get('/list-users', (req, res) => {
+    const query = "SELECT id, nome, cognome, email, capitale, password FROM users";
+    
+    userDb.all(query, [], (err, rows) => {
+        if (err) {
+            console.error('Errore durante il recupero degli utenti:', err.message);
+            return res.status(500).json({ success: false, message: 'Errore del server' });
+        }
+
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Nessun utente trovato' });
+        }
+
+        res.json({ success: true, users: rows });
+    });
+});
+
+app.get('/list-forex', (req, res) => {
+    const query = "SELECT * FROM forex";
+    
+    forexDb.all(query, [], (err, rows) => {
+        if (err) {
+            console.error('Errore durante il recupero dei dati Forex:', err.message);
+            return res.status(500).json({ success: false, message: 'Errore del server' });
+        }
+
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Nessun dato trovato nel database Forex' });
+        }
+
+        res.json({ success: true, forexData: rows });
+    });
+});
+
+
 // Reindirizzamento a forex.html dopo il login
 app.get('/forex', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'forex.html'));
