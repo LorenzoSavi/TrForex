@@ -10,9 +10,9 @@
     <div class="container">
         <div id="login-form">
             <h2>Login</h2>
-            <input type="email" id="email-login" placeholder="Email" required>
-            <input type="password" id="password-login" placeholder="Password" required>
-            <button onclick="login()">Accedi</button>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Password">
+            <button id="loginButton">Accedi</button>
             <p>Non hai un account? <a href="#" onclick="showRegister()">Registrati</a></p>
         </div>
 
@@ -30,6 +30,9 @@
             <input type="password" id="password-register" placeholder="Password" required>
             <button onclick="register()">Registrati</button>
             <p>Hai già un account? <a href="#" onclick="showLogin()">Accedi</a></p>
+
+
+            <button id="fetchAllPlayers">calciatori</button>
         </div>
     </div>
 

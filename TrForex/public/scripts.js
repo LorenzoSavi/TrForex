@@ -1,31 +1,48 @@
+document.addEventListener('DOMContentLoaded', function () {
+    const loginButton = document.getElementById('loginButton');
+    loginButton.onclick = login;
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Assicurati che gli input e il bottone siano disponibili nel DOM
+    const loginButton = document.getElementById('loginButton');
+    loginButton.addEventListener('click', login);
+});
+
 function login() {
-    const email = document.getElementById('email-login').value;
-    const password = document.getElementById('password-login').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    if (!email || !password) {
+        alert('Per favore, inserisci email e password');
+        return;
+    }
 
     fetch('/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email: email, password: password })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            fetch('/get-user-data', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            })
-            .then(response => response.json())
-            .then(userData => {
-                localStorage.setItem('username', userData.nome);
-                localStorage.setItem('capital', userData.capitale);
-                window.location.href = 'forex.html';
-            });
+            // Salva i dati nel localStorage
+            localStorage.setItem('nome', data.user.nome);
+            localStorage.setItem('capitale', data.user.capitale);
+
+            // Reindirizza alla pagina forex.html
+            window.location.href = data.redirect;
         } else {
-            alert('Credenziali errate');
+            alert(data.message); // Mostra il messaggio di errore
         }
+    })
+    .catch(err => {
+        console.error('Errore durante il login:', err);
+        alert('Errore durante il login');
     });
 }
+
+
 
 function register() {
     const nome = document.getElementById('nome').value;

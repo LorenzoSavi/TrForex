@@ -51,6 +51,130 @@
     flex-grow: 1;
 }
 
+
+.table {
+    margin-left: 18%;
+    margin-right: 20%;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: calc(90% - 280px); /* Restringe la tabella per lasciare spazio alla sidebar */
+}
+
+.table table {
+    width: 100%;
+    border-collapse: collapse; /* Rimuove gli spazi tra le celle */
+    font-family: 'Arial', sans-serif;
+}
+
+.table th, .table td {
+    padding: 5px 8px; /* Ridotto il padding per rendere le colonne più strette */
+    text-align: center;
+    border: 1px solid #ddd;
+    font-size: 13px; /* Ridotto il font per una visualizzazione più compatta */
+}
+
+.table th {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.table td {
+    background-color: #f9f9f9;
+    color: #333;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.table td:hover {
+    background-color: #f1f1f1;
+}
+
+.table tr:nth-child(even) td {
+    background-color: #f2f2f2;
+}
+
+.table tr:hover td {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+/* Intestazione sticky per la tabella */
+.table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #4CAF50;
+}
+
+.table caption {
+    font-size: 1.5em;
+    margin: 10px 0;
+    color: #333;
+}
+
+/* Ridurre la larghezza delle colonne specifiche */
+.table th:nth-child(1),
+.table td:nth-child(1) {
+    width: 10%; /* Colonna Data */
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+    width: 18%; /* Colonna Apertura */
+}
+
+.table th:nth-child(3),
+.table td:nth-child(3) {
+    width: 18%; /* Colonna Massimo */
+}
+
+.table th:nth-child(4),
+.table td:nth-child(4) {
+    width: 18%; /* Colonna Minimo */
+}
+
+.table th:nth-child(5),
+.table td:nth-child(5) {
+    width: 25%; /* Ridotto il 36% a 25% per la colonna Chiusura */
+}
+
+/* Responsive - Aggiungi una barra di scorrimento orizzontale */
+@media (max-width: 768px) {
+    .table {
+        margin-left: 10px;
+        margin-right: 10px;
+        width: calc(100% - 20px); /* Aggiusta la larghezza per gli schermi piccoli */
+    }
+
+    .table table {
+        font-size: 12px;
+    }
+
+    .table th, .table td {
+        padding: 4px 6px;
+    }
+}
+
+@media (max-width: 600px) {
+    .table {
+        padding: 10px;
+        width: calc(100% - 20px); /* Adatta ulteriormente la larghezza per schermi ancora più piccoli */
+    }
+
+    .table table {
+        font-size: 10px;
+    }
+
+    .table th, .table td {
+        padding: 3px 5px;
+    }
+}
+
+
 #forex-chart {
     width: 100%;
     height: 400px;

@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
+const swaggerUi = require('swagger-ui-express');
+const swaggerJSDoc = require('swagger-jsdoc');
 const path = require('path');
 
 const app = express();
@@ -41,6 +43,9 @@ const forexDb = new sqlite3.Database(forexDbPath, (err) => {
     }
 });
 
+
+
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -77,6 +82,8 @@ app.post('/register', (req, res) => {
 });
 
 
+
+
 app.post('/get-forex-data', (req, res) => {
     const { valuta } = req.body;
 
@@ -92,11 +99,11 @@ app.post('/get-forex-data', (req, res) => {
         }
 
         const formattedData = rows.map(row => ({
-            giorno: row.giorno,  
-            open: row.open,    
+            giorno: row.giorno,
+            open: row.open,
             massimo: row.massimo,
-            minimo: row.minimo,  
-            close: row.close    
+            minimo: row.minimo,
+            close: row.close
         }));
 
         res.json({ success: true, data: formattedData });
@@ -122,32 +129,48 @@ app.post('/login', (req, res) => {
         }
 
         console.log("Login riuscito per:", email);
-        res.json({ success: true, user: { nome: user.nome, capitale: user.capitale } });
+
+        // Reindirizza al frontend con i dati utente
+        res.json({
+            success: true,
+            user: { nome: user.nome, capitale: user.capitale },
+            redirect: '/forex' // Reindirizzamento alla pagina forex
+        });
     });
 });
 
-app.post('/get-user-data', (req, res) => {
-    const { email } = req.body;
+app.post('/get-forex-data', (req, res) => {
+    const { valuta } = req.body;
 
-    const query = "SELECT nome, capitale FROM users WHERE email = ?";
-    userDb.get(query, [email], (err, user) => {
+    if (!valuta) {
+        return res.status(400).json({ success: false, message: 'Valuta non fornita' });
+    }
+
+    const query = "SELECT * FROM forex WHERE valuta = ?";
+    forexDb.all(query, [valuta], (err, rows) => {
         if (err) {
-            console.error('Errore durante la query per i dati utente:', err.message);
+            console.error('Errore durante il recupero dei dati:', err.message);
             return res.status(500).json({ success: false, message: 'Errore del server' });
         }
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'Utente non trovato' });
+
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Nessun dato trovato per questa valuta' });
         }
 
-        res.json({ success: true, nome: user.nome, capitale: user.capitale });
+        const formattedData = rows.map(row => ({
+            giorno: row.data,         // Data originale per la tabella
+            open: row.apertura,     // Prezzo apertura
+            massimo: row.max,          // Prezzo massimo
+            minimo: row.min,           // Prezzo minimo
+            chiusura: row.chiusura     // Prezzo chiusura
+        }));
+
+        res.json({ success: true, data: formattedData });
     });
 });
-
-
-
 app.get('/list-users', (req, res) => {
     const query = "SELECT id, nome, cognome, email, capitale, password FROM users";
-    
+
     userDb.all(query, [], (err, rows) => {
         if (err) {
             console.error('Errore durante il recupero degli utenti:', err.message);
@@ -164,7 +187,7 @@ app.get('/list-users', (req, res) => {
 
 app.get('/list-forex', (req, res) => {
     const query = "SELECT * FROM forex";
-    
+
     forexDb.all(query, [], (err, rows) => {
         if (err) {
             console.error('Errore durante il recupero dei dati Forex:', err.message);
@@ -182,7 +205,8 @@ app.get('/list-forex', (req, res) => {
 app.get('/forex/filter/:valuta', (req, res) => {
     let { valuta } = req.params;
 
-    valuta = unescape(valuta);
+    // Decodifica del parametro
+    valuta = decodeURIComponent(valuta);
 
     if (!valuta) {
         return res.status(400).json({ success: false, message: 'Parametro valuta mancante' });
@@ -202,6 +226,8 @@ app.get('/forex/filter/:valuta', (req, res) => {
         res.json({ success: true, data: rows });
     });
 });
+
+
 
 
 app.get('/forex', (req, res) => {

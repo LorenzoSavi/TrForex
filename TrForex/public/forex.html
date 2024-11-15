@@ -5,12 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forex</title>
-    <link rel="stylesheet" href="forex-styles.css"> 
+    <link rel="stylesheet" href="forex-styles.css">
 </head>
 
 <body>
     <div class="sidebar">
-        <img id="profile-img" src="img/default.png" alt="Profile Picture"> 
+        <img id="profile-img" src="img/default.png" alt="Profile Picture">
         <p id="username"></p>
         <p id="capital"></p>
 
@@ -22,14 +22,29 @@
     </div>
 
     <div class="main-content">
-        <h2 id="currency-title">EUR/USD</h2>
-        <canvas id="forex-chart"></canvas>
+        <h2 id="currency-title">TrForex</h2>
+        <div id="forex-data">
+        </div>
+        
+    </div>
+    <div class="table">
+        <table>
+            <caption>Forex Data</caption>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Apertura</th>
+                    <th>Massimo</th>
+                    <th>Minimo</th>
+                    <th>Chiusura</th>
+                </tr>
+            </thead>
+            <tbody id="forex-table">
+            </tbody>
+        </table>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-
+    
     <script>
         window.onload = function () {
             const username = localStorage.getItem('username') || "Utente";
@@ -39,42 +54,45 @@
             document.getElementById('capital').textContent = capital;
 
             const images = ['img1.png', 'img2.png', 'img3.png'];
-
             const randomImage = images[Math.floor(Math.random() * images.length)];
 
-            document.getElementById('profile-img').src = `img/${randomImage}`; 
+            document.getElementById('profile-img').src = `img/${randomImage}`;
         };
 
-
         const currencyList = document.getElementById('currency-list');
-        const ctx = document.getElementById('forex-chart').getContext('2d');
-        let candleChart;
+        const forexDataDiv = document.getElementById('forex-data');
 
-        function updateChart(data) {
-            if (candleChart) {
-                candleChart.destroy();  
+        function displayData(data) {
+            forexDataDiv.innerHTML = ''; // Svuota il contenuto precedente
+            if (data.length === 0) {
+                forexDataDiv.innerHTML = '<p>Nessun dato trovato per questa valuta.</p>';
+                return;
             }
 
-            candleChart = new Chart(ctx, {
-                type: 'candlestick',
-                data: {
-                    datasets: [{
-                        label: 'Forex Data',
-                        data: data,  
-                        borderColor: 'green'
-                    }]
-                },
-                options: {
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'day'
-                            }
-                        }
-                    }
-                }
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Apertura</th>
+                    <th>Massimo</th>
+                    <th>Minimo</th>
+                    <th>Chiusura</th>
+                </tr>
+            `;
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.t}</td>
+                    <td>${row.o}</td>
+                    <td>${row.h}</td>
+                    <td>${row.l}</td>
+                    <td>${row.c}</td>
+                `;
+                table.appendChild(tr);
             });
+
+            forexDataDiv.appendChild(table);
         }
 
         function fetchForexData(valuta) {
@@ -85,22 +103,41 @@
                 },
                 body: JSON.stringify({ valuta })
             })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) {
-                        updateChart(result.data);
-                    } else {
-                        alert(result.message);
-                    }
-                })
-                .catch(error => console.error('Errore:', error));
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    updateTable(result.data); // Popola la tabella con i dati
+                } else {
+                    alert(result.message);
+                }
+            })
+            .catch(error => console.error('Errore:', error));
+        }
+
+        function updateTable(data) {
+            const tableBody = document.getElementById('forex-table');
+            tableBody.innerHTML = ''; 
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+
+                tr.innerHTML = `
+                    <td>${row.giorno}</td>
+                    <td>${row.open}</td>
+                    <td>${row.massimo}</td>
+                    <td>${row.minimo}</td>
+                    <td>${row.close}</td>
+                `;
+
+                tableBody.appendChild(tr);
+            });
         }
 
         currencyList.addEventListener('click', function (e) {
             if (e.target.tagName === 'LI') {
                 const selectedCurrency = e.target.textContent;
                 document.getElementById('currency-title').textContent = selectedCurrency;
-                fetchForexData(selectedCurrency);  
+                fetchForexData(selectedCurrency);
             }
         });
     </script>
