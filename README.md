@@ -48,7 +48,7 @@ permettono anche di aprire conti reali, supportati da istituzioni bancarie e con
 
 ![Diagramma UML](img/uml.png)
 
-Wireframe
+## Wireframe
 Ecco una rappresentazione grafica del layout dell'applicazione:
 ![Diagramma UML](img/DesingAppImage.jpg)
 
