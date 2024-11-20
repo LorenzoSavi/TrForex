@@ -27,12 +27,10 @@ permettono anche di aprire conti reali, supportati da istituzioni bancarie e con
 # Requisiti del Progetto di Trading con Conto Demo
 
 ## Requisiti di Dominio
-1. **Registrazione utente**: Gli utenti devono potersi registrare al sito con un conto demo, scegliendo l'ammontare di denaro iniziale.
-2. **Gestione delle azioni**: Gli utenti devono poter selezionare coppie di trading (es. EUR/USD) e scegliere se acquistare o vendere.
-3. **Take Profit e Stop Loss**: Gli utenti devono poter impostare soglie di take profit e stop loss per ogni operazione.
-4. **Controllo capitale**: Il sistema deve verificare che il saldo dell'utente sia sufficiente per completare un'operazione.
-5. **Storico delle operazioni**: Gli utenti devono poter vedere la cronologia delle operazioni completate (acquisti e vendite).
-6. **Visualizzazione grafici**: I dati delle azioni devono essere mostrati tramite grafici.
+1. **Gestione delle azioni**: Gli utenti devono poter selezionare coppie di trading (es. EUR/USD) e scegliere se acquistare o vendere.
+2. **Controllo capitale**: Il sistema deve verificare che il saldo dell'utente sia sufficiente per completare un'operazione.
+3. **Storico delle operazioni**: Gli utenti devono poter vedere la cronologia delle operazioni completate (acquisti e vendite).
+4. **Visualizzazione grafici**: I dati delle azioni devono essere mostrati tramite grafici.
 
 ## Requisiti Funzionali
 1. **Creazione di account**: Il sistema deve fornire un'interfaccia per la creazione di nuovi account utente, con la scelta del saldo iniziale.
@@ -41,6 +39,7 @@ permettono anche di aprire conti reali, supportati da istituzioni bancarie e con
 4. **Impostazione di Take Profit e Stop Loss**: Gli utenti devono poter impostare queste soglie durante l'inserimento dell'ordine.
 5. **Salvataggio dei dati su database**: Il sistema deve memorizzare tutte le informazioni dell'utente, inclusi saldo, ordini attivi, storico operazioni e impostazioni.
 6. **Generazione di grafici**: Il sistema deve visualizzare grafici interattivi basati sui dati di mercato in tempo reale.
+
 
 ## Requisiti Non Funzionali
 1. **Sicurezza**: I dati degli utenti devono essere protetti tramite crittografia, soprattutto quelli sensibili come saldo e operazioni.
