@@ -48,9 +48,16 @@ permettono anche di aprire conti reali, supportati da istituzioni bancarie e con
 
 ![Diagramma UML](img/uml.png)
 
-## Wireframe
-Ecco una rappresentazione grafica del layout dell'applicazione:
-![Diagramma UML](img/DesingAppImage.jpg)
+## Wireframe dell'Applicazione
+
+### Descrizione
+Il **wireframe** rappresenta la struttura e il flusso di utilizzo dell'applicazione TrForex, con una dashboard semplice ed efficiente. Nella parte sinistra, gli utenti vedranno il loro saldo e le coppie di valute selezionate. A destra, è visibile il grafico interattivo per analizzare le fluttuazioni di mercato.
+
+### Flusso Visivo
+Il wireframe mostra il processo che un utente segue, dalla ricerca del sito su un browser alla gestione delle operazioni di trading.
+
+### Immagine del Wireframe
+![Wireframe TrForex](img/DesingAppImage.jpg)
 
 ## Esempio di richiesta API
 
