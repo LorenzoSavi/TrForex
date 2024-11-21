@@ -54,12 +54,6 @@ permettono anche di aprire conti reali, supportati da istituzioni bancarie e con
 
 ## Pitch del Progetto
 
-> **"TrForex ti aiuta a entrare nel mondo del trading senza rischiare i tuoi soldi reali. Impara strategie di investimento, tieni traccia del tuo capitale e ottimizza le tue operazioni grazie ai grafici in tempo reale e notifiche personalizzate. Perfetto per chi vuole acquisire esperienza senza stress!"**
-
----
-
-## Obiettivi degli Sprint
-
 ### Sprint 1 - Implementazione delle Funzionalità Base
 
 - **Da utente voglio poter creare un account.**  
@@ -92,7 +86,7 @@ permettono anche di aprire conti reali, supportati da istituzioni bancarie e con
 Il diagramma sottostante rappresenta l'organizzazione e la priorità delle funzionalità da sviluppare in due Sprint principali. Ogni funzionalità è accompagnata da un tempo stimato per il completamento e collegata al relativo Sprint.
 
 ### Diagramma degli Sprint
-![Sprint TrForex](sprint1-2.png)
+![Sprint TrForex](img/sprint1-2.png)
 
 
 ## Wireframe dell'Applicazione
