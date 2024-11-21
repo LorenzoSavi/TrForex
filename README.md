@@ -51,6 +51,50 @@ permettono anche di aprire conti reali, supportati da istituzioni bancarie e con
 
 ![Diagramma UML](img/uml.png)
 
+
+## Pitch del Progetto
+
+> **"TrForex ti aiuta a entrare nel mondo del trading senza rischiare i tuoi soldi reali. Impara strategie di investimento, tieni traccia del tuo capitale e ottimizza le tue operazioni grazie ai grafici in tempo reale e notifiche personalizzate. Perfetto per chi vuole acquisire esperienza senza stress!"**
+
+---
+
+## Obiettivi degli Sprint
+
+### Sprint 1 - Implementazione delle Funzionalità Base
+
+- **Da utente voglio poter creare un account.**  
+  Tempo stimato: **5 ore**  
+  Gli utenti devono poter registrarsi sulla piattaforma fornendo le loro informazioni personali e un capitale iniziale simulato.
+
+- **Da amministratore voglio poter visualizzare il capitale dei miei utenti.**  
+  Tempo stimato: **8 ore**  
+  L'amministratore avrà accesso a un pannello per monitorare il capitale totale degli utenti, utile per analisi statistiche.
+
+- **Da utente voglio poter comprare titoli azionari in modo tale da imparare a fare trading.**  
+  Tempo stimato: **13 ore**  
+  Questa funzionalità consente agli utenti di selezionare coppie di valute, visualizzare i loro grafici e piazzare ordini di acquisto o vendita.
+
+### Sprint 2 - Miglioramenti e Notifiche
+
+- **Da utente voglio poter visualizzare il mio capitale intero e vedere le operazioni aperte.**  
+  Tempo stimato: **8 ore**  
+  Gli utenti avranno accesso a una dashboard dove saranno visibili il saldo totale e tutte le operazioni attualmente in corso.
+
+- **Da utente voglio poter essere notificato quando un trade aperto tocca l'average point.**  
+  Tempo stimato: **8 ore**  
+  Gli utenti riceveranno notifiche quando il prezzo di una valuta raggiunge un determinato valore preimpostato (average point).
+
+---
+
+## Diagramma degli Sprint
+
+### Descrizione
+Il diagramma sottostante rappresenta l'organizzazione e la priorità delle funzionalità da sviluppare in due Sprint principali. Ogni funzionalità è accompagnata da un tempo stimato per il completamento e collegata al relativo Sprint.
+
+### Diagramma degli Sprint
+![Sprint TrForex](sprint1-2.png)
+
+
 ## Wireframe dell'Applicazione
 
 ### Descrizione
