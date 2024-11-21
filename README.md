@@ -16,6 +16,9 @@ Con l'app **TrForex**, i giovani investitori che desiderano entrare nel mondo az
 - **Formazione**: Risorse educative per migliorare le tue conoscenze sul trading.
 - **Gestione della FOMO**: Strumenti e consigli per aiutarti a prendere decisioni più consapevoli.
 
+## Tecnologie
+- **Api**: Utilizzo di api per la richiesta di dati di mercato.
+
 
 ## Competitor 
 
