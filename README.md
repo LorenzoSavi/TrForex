@@ -26,6 +26,7 @@ I principali competitor che offrono funzionalità identiche al mio progetto sono
 Come la mia piattaforma, consentono di creare un account demo per imparare a investire. Tuttavia, a differenza del mio progetto, 
 permettono anche di aprire conti reali, supportati da istituzioni bancarie e con costi associati.
 
+---
 
 # Requisiti del Progetto di Trading con Conto Demo
 
@@ -51,6 +52,7 @@ permettono anche di aprire conti reali, supportati da istituzioni bancarie e con
 
 ![Diagramma UML](img/uml.png)
 
+---
 
 ## Pitch del Progetto
 
@@ -78,7 +80,6 @@ permettono anche di aprire conti reali, supportati da istituzioni bancarie e con
   Tempo stimato: **8 ore**  
   Gli utenti riceveranno notifiche quando il prezzo di una valuta raggiunge un determinato valore preimpostato (average point).
 
----
 
 ## Diagramma degli Sprint
 
@@ -88,6 +89,7 @@ Il diagramma sottostante rappresenta l'organizzazione e la priorità delle funzi
 ### Diagramma degli Sprint
 ![Sprint TrForex](img/sprint1-2.png)
 
+---
 
 ## Wireframe dell'Applicazione
 
@@ -106,6 +108,8 @@ Il wireframe mostra il processo che un utente segue, dalla ricerca del sito su u
    in input
 
   	charm : "EURUSD"
+
+   si ha in output: 
 
  ![output della richiesta](img/ReadmeImage1.png)
 
