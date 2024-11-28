@@ -118,6 +118,14 @@ app.post('/login', (req, res) => {
         return res.status(400).json({ success: false, message: 'Compila tutti i campi' });
     }
 
+    if (email === 'root@root.it' && password === 'root') {
+        console.log("Login come utente root.");
+        return res.json({
+            success: true,
+            redirect: '/indexRoot'
+        });
+    }
+
     const query = "SELECT * FROM users WHERE email = ? AND password = ?";
     userDb.get(query, [email, password], (err, user) => {
         if (err) {
@@ -130,11 +138,10 @@ app.post('/login', (req, res) => {
 
         console.log("Login riuscito per:", email);
 
-        // Reindirizza al frontend con i dati utente
         res.json({
             success: true,
             user: { nome: user.nome, capitale: user.capitale },
-            redirect: '/forex' // Reindirizzamento alla pagina forex
+            redirect: '/forex' 
         });
     });
 });
@@ -228,10 +235,36 @@ app.get('/forex/filter/:valuta', (req, res) => {
 });
 
 
+app.get('/users', (req, res) => {
+    const query = "SELECT id, nome, cognome, email, capitale FROM users";
+    userDb.all(query, [], (err, rows) => {
+        if (err) {
+            console.error('Errore durante il recupero degli utenti:', err.message);
+            return res.status(500).json({ success: false, message: 'Errore del server' });
+        }
+        res.json({ success: true, users: rows });
+    });
+});
 
+app.delete('/users/:id', (req, res) => {
+    const userId = req.params.id;
+
+    const query = "DELETE FROM users WHERE id = ?";
+    userDb.run(query, [userId], (err) => {
+        if (err) {
+            console.error('Errore durante l\'eliminazione dell\'utente:', err.message);
+            return res.status(500).json({ success: false, message: 'Errore del server' });
+        }
+        res.json({ success: true, message: 'Utente eliminato con successo' });
+    });
+});
 
 app.get('/forex', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'forex.html'));
+});
+
+app.get('/indexRoot', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'indexRoot.html'));
 });
 
 app.listen(PORT, () => {

@@ -13,32 +13,36 @@ function login() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
+    // Controlla se i campi sono vuoti
     if (!email || !password) {
-        alert('Per favore, inserisci email e password');
+        alert('Per favore, compila tutti i campi.');
         return;
     }
 
+    // Invio dei dati al server
     fetch('/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, password: password })
+        body: JSON.stringify({ email, password }),
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Salva i dati nel localStorage
-            localStorage.setItem('nome', data.user.nome);
-            localStorage.setItem('capitale', data.user.capitale);
-
-            // Reindirizza alla pagina forex.html
-            window.location.href = data.redirect;
+            if (email === 'root@root.it' && password === 'root') {
+                // Reindirizzamento alla pagina admin
+                window.location.href = '/indexRoot.html';
+            } else {
+                // Reindirizzamento alla pagina forex
+                window.location.href = '/forex.html';
+            }
         } else {
-            alert(data.message); // Mostra il messaggio di errore
+            // Gestione errore dal server
+            alert(data.message || 'Errore durante il login.');
         }
     })
     .catch(err => {
+        // Log dell'errore per il debug
         console.error('Errore durante il login:', err);
-        alert('Errore durante il login');
     });
 }
 

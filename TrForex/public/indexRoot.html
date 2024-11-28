@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Root Dashboard</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Benvenuto, Root!</h1>
+        <h2>Gestione Utenti</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Email</th>
+                    <th>Capitale</th>
+                    <th>Azioni</th>
+                </tr>
+            </thead>
+            <tbody id="userTable"></tbody>
+        </table>
+        <div class="logout">
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </div>
+    <script>
+        // Carica tutti gli utenti
+        function loadUsers() {
+            fetch('/users')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const userTable = document.getElementById('userTable');
+                        userTable.innerHTML = ''; // Pulisce la tabella
+                        data.users.forEach(user => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${user.id}</td>
+                                <td>${user.nome}</td>
+                                <td>${user.cognome}</td>
+                                <td>${user.email}</td>
+                                <td>${user.capitale}</td>
+                                <td><button onclick="deleteUser(${user.id})">Elimina</button></td>
+                            `;
+                            userTable.appendChild(row);
+                        });
+                    } else {
+                        alert('Errore durante il caricamento degli utenti.');
+                    }
+                })
+                .catch(err => console.error('Errore:', err));
+        }
+
+        // Elimina un utente
+        function deleteUser(userId) {
+            if (confirm('Sei sicuro di voler eliminare questo utente?')) {
+                fetch(`/users/${userId}`, {
+                    method: 'DELETE',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        loadUsers(); // Ricarica la lista utenti
+                    } else {
+                        alert('Errore durante l\'eliminazione dell\'utente.');
+                    }
+                })
+                .catch(err => console.error('Errore:', err));
+            }
+        }
+
+        function logout() {
+            alert('Logout effettuato!');
+            window.location.href = '/index.html'; // Torna alla pagina di login
+        }
+        // Carica gli utenti all'avvio
+        window.onload = loadUsers;
+    </script>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #a8e6cf, #dcedc1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 70%;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            text-align: center;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th,
+        table td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #f4f4f4;
+            color: #333;
+            font-weight: bold;
+        }
+
+        table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        button {
+            background: #a8e6cf;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #81c784;
+        }
+
+        button.delete {
+            background: #f44336;
+            transition: background 0.3s ease;
+        }
+
+        button.delete:hover {
+            background: #d32f2f;
+        }
+
+        .logout {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .logout a {
+            text-decoration: none;
+            color: #81c784;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .logout a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</body>
+</html>
