@@ -102,6 +102,8 @@ Il wireframe mostra il processo che un utente segue, dalla ricerca del sito su u
 ### Immagine del Wireframe
 ![Wireframe TrForex](img/DesingAppImage.jpg)
 
+---
+
 ## Esempio di richiesta API
 
 1. un esempio di richiesta risposta API può essere la richiesta di una certa quotazione , per esempio EURUSD , e la risposta del minimo e massimo giornaliero
