@@ -212,7 +212,6 @@ app.get('/list-forex', (req, res) => {
 app.get('/forex/filter/:valuta', (req, res) => {
     let { valuta } = req.params;
 
-    // Decodifica del parametro
     valuta = decodeURIComponent(valuta);
 
     if (!valuta) {
@@ -232,6 +231,13 @@ app.get('/forex/filter/:valuta', (req, res) => {
 
         res.json({ success: true, data: rows });
     });
+
+    const data = {
+        dates: rows.map(row => row.date),
+        massimo: rows.map(row => row.open),
+        minimo: rows.map(row => row.close)
+    };
+    res.json(data);
 });
 
 

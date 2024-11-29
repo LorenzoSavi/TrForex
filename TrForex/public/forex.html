@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forex</title>
     <link rel="stylesheet" href="forex-styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
 <body>
@@ -25,7 +27,7 @@
         <h2 id="currency-title">TrForex</h2>
         <div id="forex-data">
         </div>
-        
+
     </div>
     <div class="table">
         <table>
@@ -42,96 +44,34 @@
             <tbody id="forex-table">
             </tbody>
         </table>
+
+        <main id="main">
+            <canvas id="forexChart" width="800" height="400"></canvas>
+        </main>
     </div>
 
-    
+
+
+
+
     <script>
         window.onload = function () {
-            const username = localStorage.getItem('username') || "Utente";
-            const capital = localStorage.getItem('capital') || "€10000";
+            const username = localStorage.getItem('nome') || "Utente";
+            const capital = localStorage.getItem('capitale') || "€10000";
 
             document.getElementById('username').textContent = username;
             document.getElementById('capital').textContent = capital;
 
             const images = ['img1.png', 'img2.png', 'img3.png'];
             const randomImage = images[Math.floor(Math.random() * images.length)];
-
             document.getElementById('profile-img').src = `img/${randomImage}`;
         };
 
         const currencyList = document.getElementById('currency-list');
-        const forexDataDiv = document.getElementById('forex-data');
+        const forexTable = document.getElementById('forex-table');
+        const candlestickChart = document.getElementById('candlestick-chart');
 
-        function displayData(data) {
-            forexDataDiv.innerHTML = ''; // Svuota il contenuto precedente
-            if (data.length === 0) {
-                forexDataDiv.innerHTML = '<p>Nessun dato trovato per questa valuta.</p>';
-                return;
-            }
-
-            const table = document.createElement('table');
-            table.innerHTML = `
-                <tr>
-                    <th>Timestamp</th>
-                    <th>Apertura</th>
-                    <th>Massimo</th>
-                    <th>Minimo</th>
-                    <th>Chiusura</th>
-                </tr>
-            `;
-
-            data.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${row.t}</td>
-                    <td>${row.o}</td>
-                    <td>${row.h}</td>
-                    <td>${row.l}</td>
-                    <td>${row.c}</td>
-                `;
-                table.appendChild(tr);
-            });
-
-            forexDataDiv.appendChild(table);
-        }
-
-        function fetchForexData(valuta) {
-            fetch('/get-forex-data', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ valuta })
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    updateTable(result.data); // Popola la tabella con i dati
-                } else {
-                    alert(result.message);
-                }
-            })
-            .catch(error => console.error('Errore:', error));
-        }
-
-        function updateTable(data) {
-            const tableBody = document.getElementById('forex-table');
-            tableBody.innerHTML = ''; 
-
-            data.forEach(row => {
-                const tr = document.createElement('tr');
-
-                tr.innerHTML = `
-                    <td>${row.giorno}</td>
-                    <td>${row.open}</td>
-                    <td>${row.massimo}</td>
-                    <td>${row.minimo}</td>
-                    <td>${row.close}</td>
-                `;
-
-                tableBody.appendChild(tr);
-            });
-        }
+        let chartInstance;
 
         currencyList.addEventListener('click', function (e) {
             if (e.target.tagName === 'LI') {
@@ -140,6 +80,193 @@
                 fetchForexData(selectedCurrency);
             }
         });
+
+        function fetchForexData(valuta) {
+            fetch('/get-forex-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ valuta })
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        updateTable(result.data);
+                        renderChart(result.data);
+                    } else {
+                        alert(result.message);
+                    }
+                })
+                .catch(error => console.error('Errore:', error));
+        }
+
+        function updateTable(data) {
+            forexTable.innerHTML = '';
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                <td>${row.giorno}</td>
+                <td>${row.open}</td>
+                <td>${row.massimo}</td>
+                <td>${row.minimo}</td>
+                <td>${row.close}</td>
+            `;
+                forexTable.appendChild(tr);
+            });
+        }
+
+        // Funzione per creare il grafico
+        function createChart(dates, openData, closeData) {
+            const ctx = document.getElementById('forexChart').getContext('2d');
+
+            // Distruggi il grafico precedente (se esiste)
+            if (window.chartInstance) {
+                window.chartInstance.destroy();
+            }
+
+            // Crea il nuovo grafico
+            window.chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates, // Date
+                    datasets: [
+                        {
+                            label: 'Apertura',
+                            data: openData,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Chiusura',
+                            data: closeData,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Data' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Valore' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Funzione per caricare i dati dal server
+        function loadCurrencyData(currency) {
+            fetch('/forex/filter/:valuta')
+                .then(response => response.json())
+                .then(data => {
+                    createChart(data.dates, data.open, data.close);
+                })
+                .catch(err => console.error('Errore nel caricamento dei dati:', err));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const currencyList = document.getElementById('currency-list');
+            const forexTable = document.getElementById('forex-table');
+            const currencyTitle = document.getElementById('currency-title');
+            const chartCanvas = document.getElementById('forexChart');
+            let chartInstance;
+
+            // Funzione per creare il grafico
+            function createChart(dates, openData, closeData) {
+                const ctx = chartCanvas.getContext('2d');
+
+                // Distruggi il grafico precedente (se esiste)
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
+
+                // Crea il nuovo grafico
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: 'Apertura',
+                                data: openData,
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 2,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Chiusura',
+                                data: closeData,
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 2,
+                                tension: 0.3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Data' }
+                            },
+                            y: {
+                                title: { display: true, text: 'Valore' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Funzione per aggiornare la tabella
+            function updateTable(data) {
+                forexTable.innerHTML = '';
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                <td>${row.date}</td>
+                <td>${row.open}</td>
+                <td>${row.high}</td>
+                <td>${row.low}</td>
+                <td>${row.close}</td>
+            `;
+                    forexTable.appendChild(tr);
+                });
+            }
+
+            // Funzione per caricare i dati
+            function loadCurrencyData(currency) {
+                fetch(`/forex/:valuta`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Aggiorna tabella e grafico
+                        updateTable(data.rows);
+                        createChart(data.dates, data.opens, data.closes);
+                    })
+                    .catch(err => console.error('Errore nel caricamento dei dati:', err));
+            }
+
+            // Gestione click sulla lista delle valute
+            currencyList.addEventListener('click', event => {
+                const target = event.target;
+                if (target.tagName === 'LI') {
+                    const currency = target.getAttribute('data-currency');
+                    currencyTitle.textContent = target.textContent;
+                    loadCurrencyData(currency);
+                }
+            });
+
+            // Caricamento iniziale
+            loadCurrencyData('EURUSD');
+        });
+
+
+
+
+
     </script>
 </body>
 
