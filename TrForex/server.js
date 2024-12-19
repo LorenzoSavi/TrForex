@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const swaggerUi = require('swagger-ui-express');
-const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerJsDoc = require('swagger-jsdoc');
 const path = require('path');
 
 const app = express();
@@ -10,6 +10,26 @@ const PORT = 3000;
 
 const userDbPath = path.resolve(__dirname, 'database-user.db');
 const forexDbPath = path.resolve(__dirname, 'database-forex.db');
+
+
+const swaggerOptions = {
+    definition: {
+        openapi: "3.0.0",
+        info: {
+            title: "Forex API",
+            version: "1.0.0",
+            description: "API per gestire i dati Forex"
+        },
+        servers: [
+            {
+                url: "http://localhost:3000",
+                description: "Server locale"
+            }
+        ]
+    },
+    apis: ["./server.js"], 
+};
+
 
 const userDb = new sqlite3.Database(userDbPath, (err) => {
     if (err) {
@@ -50,6 +70,39 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Registra un nuovo utente
+ *     description: Aggiunge un nuovo utente al database.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               cognome:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               capitale:
+ *                 type: number
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Registrazione avvenuta con successo.
+ *       400:
+ *         description: Errore nei dati forniti.
+ *       409:
+ *         description: Email già registrata.
+ */
 
 app.post('/register', (req, res) => {
     const { nome, cognome, email, capitale, password } = req.body;
@@ -175,6 +228,18 @@ app.post('/get-forex-data', (req, res) => {
         res.json({ success: true, data: formattedData });
     });
 });
+
+
+/**
+ * @swagger
+ * /list-users:
+ *   get:
+ *     summary: Ottiene la lista di tutti gli utenti
+ *     responses:
+ *       200:
+ *         description: Lista di utenti
+ */
+
 app.get('/list-users', (req, res) => {
     const query = "SELECT id, nome, cognome, email, capitale, password FROM users";
 
@@ -191,6 +256,16 @@ app.get('/list-users', (req, res) => {
         res.json({ success: true, users: rows });
     });
 });
+
+/**
+ * @swagger
+ * /list-forex:
+ *   get:
+ *     summary: Ottiene i dati Forex
+ *     responses:
+ *       200:
+ *         description: Lista dei dati Forex
+ */
 
 app.get('/list-forex', (req, res) => {
     const query = "SELECT * FROM forex";
@@ -273,6 +348,11 @@ app.get('/indexRoot', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'indexRoot.html'));
 });
 
+
+const swaggerSpec = swaggerJsDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.listen(PORT, () => {
     console.log(`Server in esecuzione --> http://localhost:${PORT}`);
+    console.log(`Swagger disponibile su --> http://localhost:${PORT}/api-docs`);
 });
