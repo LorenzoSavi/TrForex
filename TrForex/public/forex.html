@@ -12,7 +12,7 @@
 
 <body>
     <div class="sidebar">
-        <img id="profile-img" src="img/default.png" alt="Profile Picture">
+        <img id="userImage" src="img/default.png" alt="Profile Picture">
         <p id="username"></p>
         <p id="capital"></p>
 
@@ -55,17 +55,26 @@
 
 
     <script>
-        window.onload = function () {
-            const username = localStorage.getItem('nome') || "Utente";
-            const capital = localStorage.getItem('capitale') || "€10000";
+        document.addEventListener('DOMContentLoaded', function () {
+            // Recupera nome e capitale dal localStorage
+            const nome = localStorage.getItem('nome');
+            const capitale = localStorage.getItem('capitale');
 
-            document.getElementById('username').textContent = username;
-            document.getElementById('capital').textContent = capital;
+            // Se i dati non esistono, reindirizza al login
+            if (!nome || !capitale) {
+                alert('Sessione scaduta. Effettua nuovamente il login.');
+                window.location.href = '/';
+                return;
+            }
 
-            const images = ['img1.png', 'img2.png', 'img3.png'];
-            const randomImage = images[Math.floor(Math.random() * images.length)];
-            document.getElementById('profile-img').src = `img/${randomImage}`;
-        };
+            document.getElementById('username').textContent = nome;
+            document.getElementById('capital').textContent = `Capitale: ${capitale}`;
+
+            const randomImage = `/img/profile${Math.floor(Math.random() * 3) + 1}.jpg`; 
+            document.getElementById('userImage').src = randomImage;
+        });
+
+
 
         const currencyList = document.getElementById('currency-list');
         const forexTable = document.getElementById('forex-table');

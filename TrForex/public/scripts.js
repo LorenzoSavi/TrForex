@@ -1,7 +1,3 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const loginButton = document.getElementById('loginButton');
-    loginButton.onclick = login;
-});
 
 document.addEventListener('DOMContentLoaded', function () {
     // Assicurati che gli input e il bottone siano disponibili nel DOM
@@ -9,17 +5,38 @@ document.addEventListener('DOMContentLoaded', function () {
     loginButton.addEventListener('click', login);
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+    fetch('/list-forex')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const tableBody = document.querySelector('#forex-table tbody');
+                data.forexData.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${row.valuta}</td>
+                        <td>${row.giorno}</td>
+                        <td>${row.massimo}</td>
+                        <td>${row.minimo}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } else {
+                console.error('Errore nel recupero dei dati Forex:', data.message);
+            }
+        })
+        .catch(error => console.error('Errore nella richiesta:', error));
+});
+
 function login() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    // Controlla se i campi sono vuoti
     if (!email || !password) {
         alert('Per favore, compila tutti i campi.');
         return;
     }
 
-    // Invio dei dati al server
     fetch('/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -28,23 +45,24 @@ function login() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            const { nome, capitale } = data.user; // Assumi che il server restituisca nome e capitale
+            localStorage.setItem('nome', nome);
+            localStorage.setItem('capitale', capitale);
+
             if (email === 'root@root.it' && password === 'root') {
-                // Reindirizzamento alla pagina admin
                 window.location.href = '/indexRoot.html';
             } else {
-                // Reindirizzamento alla pagina forex
                 window.location.href = '/forex.html';
             }
         } else {
-            // Gestione errore dal server
             alert(data.message || 'Errore durante il login.');
         }
     })
     .catch(err => {
-        // Log dell'errore per il debug
         console.error('Errore durante il login:', err);
     });
 }
+
 
 
 
