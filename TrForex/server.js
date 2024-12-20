@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3').verbose();
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const path = require('path');
+const cors = require('cors');
 
 const app = express();
 const PORT = 3000;
@@ -22,7 +23,7 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: "http://localhost:3000",
+                url: "https://sturdy-space-journey-976r4jpxr773p6xg-3000.app.github.dev",
                 description: "Server locale"
             }
         ]
@@ -63,14 +64,23 @@ const forexDb = new sqlite3.Database(forexDbPath, (err) => {
     }
 });
 
+const corsOptions = {
+    origin: ['http://sturdy-space-journey-976r4jpxr773p6xg.app.github.dev'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+};
 
+const swaggerDocument = swaggerJsDoc(swaggerOptions);
 
-
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+app.use(cors(corsOptions));
 
 /**
  * @swagger
