@@ -44,15 +44,18 @@ function login() {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            const { nome, capitale } = data.user; // Assumi che il server restituisca nome e capitale
-            localStorage.setItem('nome', nome);
-            localStorage.setItem('capitale', capitale);
+        console.log('Server response:', data); // Log per il debug
 
+        if (data.success) {
             if (email === 'root@root.it' && password === 'root') {
-                window.location.href = '/indexRoot.html';
-            } else {
+                window.location.href = data.redirect || '/indexRoot.html'; // Usa il redirect specificato dal server
+            } else if (data.user) {
+                const { nome, capitale } = data.user;
+                localStorage.setItem('nome', nome);
+                localStorage.setItem('capitale', capitale);
                 window.location.href = '/forex.html';
+            } else {
+                alert('Utente non valido o dati incompleti.');
             }
         } else {
             alert(data.message || 'Errore durante il login.');
@@ -62,6 +65,7 @@ function login() {
         console.error('Errore durante il login:', err);
     });
 }
+
 
 
 

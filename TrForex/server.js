@@ -172,10 +172,9 @@ app.post('/login', (req, res) => {
     }
 
     if (email === 'root@root.it' && password === 'root') {
-        console.log("Login come utente root.");
         return res.json({
             success: true,
-            redirect: '/indexRoot'
+            redirect: '/indexRoot.html',
         });
     }
 
