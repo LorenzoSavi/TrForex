@@ -2,10 +2,8 @@ require('dotenv').config(); // Carica variabili dal file .env
 const axios = require('axios');
 const sqlite3 = require('sqlite3').verbose();
 
-// Imposta connessione al database
 const db = new sqlite3.Database('database-forex.db');
 
-// Crea tabella se non esiste
 db.run(`
     CREATE TABLE IF NOT EXISTS forex_rates (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,11 +14,9 @@ db.run(`
     )
 `);
 
-// Chiave API e URL
 const API_KEY = process.env.FOREX_API_KEY; // Legge la chiave API dal file .env
 const API_URL = `https://api.forexrateapi.com/v1/latest?api_key=${API_KEY}&base=USD&currencies=EUR,INR,JPY`;
 
-// Funzione per salvare i dati nel database
 const saveForexRatesToDB = (rates) => {
     const query = `INSERT INTO forex_rates (base_currency, target_currency, rate) VALUES (?, ?, ?)`;
     
@@ -36,7 +32,6 @@ const saveForexRatesToDB = (rates) => {
     });
 };
 
-// Funzione per ottenere e salvare i dati dall'API
 const fetchAndSaveForexRates = async () => {
     try {
         const response = await axios.get(API_URL);
@@ -53,5 +48,4 @@ const fetchAndSaveForexRates = async () => {
     }
 };
 
-// Avvia il fetch
 fetchAndSaveForexRates();
