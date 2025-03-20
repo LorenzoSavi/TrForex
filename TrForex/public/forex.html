@@ -49,6 +49,8 @@
             <canvas id="forexChart" width="800" height="400"></canvas>
         </main>
     </div>
+    <button id="logoutButton" style="position: absolute; top: 10px; right: 10px;">Logout</button>
+
 
 
 
@@ -67,11 +69,26 @@
                 return;
             }
 
+            
+
             document.getElementById('username').textContent = nome;
             document.getElementById('capital').textContent = `Capitale: ${capitale}`;
 
             const randomImage = `/img/profile${Math.floor(Math.random() * 3) + 1}.jpg`; 
             document.getElementById('userImage').src = randomImage;
+
+            const logoutButton = document.getElementById('logoutButton');
+            logoutButton.addEventListener('click', function() {
+                fetch('/logout', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            localStorage.removeItem('nome');
+                            localStorage.removeItem('capitale');
+                            window.location.href = '/index.html'; 
+                        }
+                    });
+            });
         });
 
 

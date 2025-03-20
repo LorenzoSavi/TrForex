@@ -5,6 +5,8 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const path = require('path');
 const cors = require('cors');
+const session = require('express-session'); 
+const cookieParser = require('cookie-parser'); 
 
 const app = express();
 const PORT = 3000;
@@ -63,6 +65,14 @@ const forexDb = new sqlite3.Database(forexDbPath, (err) => {
         });
     }
 });
+
+app.use(cookieParser()); 
+app.use(session({ 
+    secret: 'tuo_segreto_sicuro', 
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } 
+}));
 
 const corsOptions = {
     origin: ['http://sturdy-space-journey-976r4jpxr773p6xg.app.github.dev'],
@@ -182,6 +192,7 @@ app.post('/login', (req, res) => {
     }
 
     if (email === 'root@root.it' && password === 'root') {
+        req.session.user = { email: email, role: 'root' }; // Salva l'utente in sessione
         return res.json({
             success: true,
             redirect: '/indexRoot.html',
@@ -200,11 +211,19 @@ app.post('/login', (req, res) => {
 
         console.log("Login riuscito per:", email);
 
+        req.session.user = { id: user.id, nome: user.nome, capitale: user.capitale }; // Salva l'utente in sessione
+
         res.json({
             success: true,
             user: { nome: user.nome, capitale: user.capitale },
-            redirect: '/forex' 
+            redirect: '/forex'
         });
+    });
+});
+
+app.post('/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.json({ success: true, message: 'Logout effettuato' });
     });
 });
 
@@ -349,7 +368,17 @@ app.delete('/users/:id', (req, res) => {
     });
 });
 
-app.get('/forex', (req, res) => {
+const requireAuth = (req, res, next) => {
+    if (req.session && req.session.user) {
+        next(); // L'utente è autenticato, passa alla prossima rotta
+    } else {
+        res.status(401).json({ success: false, message: 'Non autenticato' });
+    }
+};
+
+
+
+app.get('/forex', requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'forex.html'));
 });
 

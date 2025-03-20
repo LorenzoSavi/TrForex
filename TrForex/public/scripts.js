@@ -1,6 +1,12 @@
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Assicurati che gli input e il bottone siano disponibili nel DOM
+
+    const testLoginButton = document.getElementById('testLoginButton');
+    testLoginButton.addEventListener('click', function() {
+        document.getElementById('email').value = 'test@example.com';
+        document.getElementById('password').value = 'password123';
+        login(); });
+
     const loginButton = document.getElementById('loginButton');
     loginButton.addEventListener('click', login);
 });
@@ -66,9 +72,27 @@ function login() {
     });
 }
 
+function logout() {
+    fetch('/logout', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                localStorage.removeItem('nome');
+                localStorage.removeItem('capitale');
+                window.location.href = '/index.html'; // Reindirizza alla pagina di login
+            }
+        });
+}
 
 
-
+if (window.location.pathname === '/forex.html') {
+    fetch('/forex')
+        .then(response => {
+            if (!response.ok) {
+                window.location.href = '/index.html'; // Reindirizza se non autenticato
+            }
+        });
+}
 
 function register() {
     const nome = document.getElementById('nome').value;
