@@ -11,8 +11,8 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 3000;
 
-const userDbPath = path.resolve(__dirname, 'database-user.db');
-const forexDbPath = path.resolve(__dirname, 'database-forex.db');
+const userDbPath = path.resolve(__dirname, 'database/database-user.db');
+const forexDbPath = path.resolve(__dirname, 'database/database-forex.db');
 
 
 const swaggerOptions = {

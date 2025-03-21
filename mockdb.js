@@ -1,8 +1,8 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-const userDbPath = path.resolve(__dirname, 'database-user-mk.db');
-const forexDbPath = path.resolve(__dirname, 'database-forex-mk.db');
+const userDbPath = path.resolve(__dirname, 'database/database-user-mk.db');
+const forexDbPath = path.resolve(__dirname, 'database/database-forex-mk.db');
 
 const userDb = new sqlite3.Database(userDbPath, (err) => {
     if (err) {

@@ -2,7 +2,7 @@ require('dotenv').config(); // Carica variabili dal file .env
 const axios = require('axios');
 const sqlite3 = require('sqlite3').verbose();
 
-const db = new sqlite3.Database('database-forex.db');
+const db = new sqlite3.Database('database/database-forex.db');
 
 db.run(`
     CREATE TABLE IF NOT EXISTS forex_rates (
