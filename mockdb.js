@@ -29,6 +29,7 @@ const userDb = new sqlite3.Database(userDbPath, (err) => {
     }
 });
 
+
 const forexDb = new sqlite3.Database(forexDbPath, (err) => {
     if (err) {
         console.error('Errore durante la connessione al database Forex:', err.message);

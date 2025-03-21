@@ -118,7 +118,7 @@ Il wireframe mostra il processo che un utente segue, dalla ricerca del sito su u
 ## Come Iniziare
 
 1. Scarica l'app TrForex.
-2. Installa i pacchetti (entra nella cartella /workspaces/TrForex/TrForex ed esegui "npm install") e avvia l'app , digitando "node server.js".
+2. Installa i pacchetti (esegui "npm install") e avvia l'app , digitando "node server.js".
 2.1. Avrai un rapito bottone per accedere nel applicazione con dati da test per controllare l'applicazione 
 3. Crea il tuo conto demo registrandoti nell'apposita schermata.
 4. Inizia a esplorare le opportunità di trading in Forex e azioni.
