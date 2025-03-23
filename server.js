@@ -14,6 +14,25 @@ const PORT = 3000;
 const userDbPath = path.resolve(__dirname, 'database/database-user.db');
 const forexDbPath = path.resolve(__dirname, 'database/database-forex.db');
 
+const WebSocket = require('ws');
+
+const wss = new WebSocket.Server({ port: 8080 });
+
+let visitorCount = 0;
+
+wss.on('connection', ws => {
+  visitorCount++;
+  wss.clients.forEach(client => {
+    client.send(visitorCount);
+  });
+
+  ws.on('close', () => {
+    visitorCount--;
+    wss.clients.forEach(client => {
+      client.send(visitorCount);
+    });
+  });
+});
 
 const swaggerOptions = {
     definition: {
@@ -191,7 +210,7 @@ app.post('/login', (req, res) => {
         return res.status(400).json({ success: false, message: 'Compila tutti i campi' });
     }
 
-    if (email === 'root@root.it' && password === 'root') {
+    if (email === '@root.itroot' && password === 'root') {
         req.session.user = { email: email, role: 'root' }; // Salva l'utente in sessione
         return res.json({
             success: true,
