@@ -9,6 +9,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const loginButton = document.getElementById('loginButton');
     loginButton.addEventListener('click', login);
+
+    const swaggerButton = document.getElementById('swaggerButton');
+    swaggerButton.addEventListener('click', function() {
+        window.location.href = '/api-docs'; 
+    });
 });
 
 document.addEventListener("DOMContentLoaded", () => {

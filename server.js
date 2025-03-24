@@ -34,6 +34,8 @@ wss.on('connection', ws => {
   });
 });
 
+app.use(cors());
+
 const swaggerOptions = {
     definition: {
         openapi: "3.0.0",
@@ -49,7 +51,7 @@ const swaggerOptions = {
             }
         ]
     },
-    apis: ["./server.js"], 
+    apis: ["./swagger.js"],
 };
 
 
@@ -93,13 +95,6 @@ app.use(session({
     cookie: { secure: false } 
 }));
 
-const corsOptions = {
-    origin: ['http://sturdy-space-journey-976r4jpxr773p6xg.app.github.dev'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-};
-
 const swaggerDocument = swaggerJsDoc(swaggerOptions);
 
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -108,40 +103,6 @@ app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-app.use(cors(corsOptions));
-
-/**
- * @swagger
- * /register:
- *   post:
- *     summary: Registra un nuovo utente
- *     description: Aggiunge un nuovo utente al database.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               nome:
- *                 type: string
- *               cognome:
- *                 type: string
- *               email:
- *                 type: string
- *               capitale:
- *                 type: number
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Registrazione avvenuta con successo.
- *       400:
- *         description: Errore nei dati forniti.
- *       409:
- *         description: Email già registrata.
- */
 
 app.post('/register', (req, res) => {
     const { nome, cognome, email, capitale, password } = req.body;
@@ -277,16 +238,6 @@ app.post('/get-forex-data', (req, res) => {
 });
 
 
-/**
- * @swagger
- * /list-users:
- *   get:
- *     summary: Ottiene la lista di tutti gli utenti
- *     responses:
- *       200:
- *         description: Lista di utenti
- */
-
 app.get('/list-users', (req, res) => {
     const query = "SELECT id, nome, cognome, email, capitale, password FROM users";
 
@@ -304,15 +255,7 @@ app.get('/list-users', (req, res) => {
     });
 });
 
-/**
- * @swagger
- * /list-forex:
- *   get:
- *     summary: Ottiene i dati Forex
- *     responses:
- *       200:
- *         description: Lista dei dati Forex
- */
+
 
 app.get('/list-forex', (req, res) => {
     const query = "SELECT * FROM forex";
@@ -361,6 +304,18 @@ app.get('/forex/filter/:valuta', (req, res) => {
     };
     res.json(data);
 });
+
+app.get('/users/filtered', (req, res) => {
+    const query = "SELECT id, nome, cognome, email, capitale FROM users WHERE capitale > 4500";
+    userDb.all(query, [], (err, rows) => {
+        if (err) {
+            console.error('Errore durante il recupero degli utenti filtrati:', err.message);
+            return res.status(500).json({ success: false, message: 'Errore del server' });
+        }
+        res.json({ success: true, users: rows });
+    });
+});
+
 
 
 app.get('/users', (req, res) => {

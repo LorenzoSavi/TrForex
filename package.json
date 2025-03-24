@@ -8,6 +8,7 @@
     "express-session": "^1.18.1",
     "init": "^0.1.2",
     "sqlite3": "^5.1.7",
+    "swagger": "^0.7.5",
     "swagger-autogen": "^2.23.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
