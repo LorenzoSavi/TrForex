@@ -14,7 +14,7 @@ db.run(`
     )
 `);
 
-const API_KEY = process.env.FOREX_API_KEY; // Legge la chiave API dal file .env
+const API_KEY = process.env.FOREX_API_KEY; 
 const API_URL = `https://api.forexrateapi.com/v1/latest?api_key=${API_KEY}&base=USD&currencies=EUR,INR,JPY`;
 
 const saveForexRatesToDB = (rates) => {

@@ -1,9 +1,16 @@
 /* Stili specifici per la pagina Forex */
+body {
+    font-family: 'Roboto', sans-serif; /* Font moderno */
+    background: linear-gradient(135deg, #e0c2ff, #c2e0ff); /* Sfumatura di sfondo leggera */
+    color: #333;
+    display: flex; /* Layout Flexbox */
+}
+
 .sidebar {
-    width: 250px;
-    background-color: #333;
+    width: 280px; /* Sidebar leggermente più larga */
+    background-color: #2c3e50; /* Colore scuro elegante */
     color: white;
-    padding: 20px;
+    padding: 30px; /* Padding più ampio */
     position: fixed;
     top: 0;
     left: 0;
@@ -11,218 +18,200 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2); /* Ombreggiatura leggera */
 }
 
 .sidebar img {
     border-radius: 50%;
-    width: 100px;
-    height: 100px;
+    width: 120px; /* Immagine più grande */
+    height: 120px;
     object-fit: cover;
-    margin-bottom: 15px;
+    margin-bottom: 25px; /* Margine inferiore più ampio */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Ombreggiatura leggera */
 }
 
 #logoutButton {
-    padding: 8px 12px;
-    background-color: #f44336;
+    padding: 12px 20px; /* Pulsante più grande */
+    background-color: #e74c3c; /* Rosso più vivace */
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px; /* Bordi più arrotondati */
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 #logoutButton:hover {
-    background-color: #d32f2f;
+    background-color: #c0392b; /* Rosso più scuro al passaggio del mouse */
+    transform: translateY(-2px);
 }
 
 .sidebar p {
-    margin: 10px 0;
+    margin: 15px 0; /* Margine più ampio */
+    font-size: 16px; /* Testo più grande */
 }
 
 #currency-list {
     list-style-type: none;
     padding: 0;
-    margin-top: 20px;
+    margin-top: 30px; /* Margine superiore più ampio */
     width: 100%;
 }
 
 #currency-list li {
-    padding: 10px;
-    background-color: #444;
-    margin: 5px 0;
+    padding: 15px; /* Padding più ampio */
+    background-color: #34495e; /* Colore più chiaro per la lista */
+    margin: 8px 0; /* Margine più ampio */
     text-align: center;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+    border-radius: 8px; /* Bordi più arrotondati */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    cursor: pointer;
 }
 
 #currency-list li:hover {
-    background-color: #555;
+    background-color: #2c3e50; /* Colore più scuro al passaggio del mouse */
+    transform: translateY(-2px);
 }
 
 .main-content {
-    margin-left: 260px;
-    padding: 20px;
+    margin-left: 300px; /* Corrisponde alla larghezza della sidebar */
+    padding: 30px; /* Padding più ampio */
     flex-grow: 1;
 }
 
-
 .table {
-    margin-left: 18%;
-    margin-right: 20%;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    width: calc(90% - 280px); /* Restringe la tabella per lasciare spazio alla sidebar */
+    margin-left: 2%; /* Margine ridotto */
+    margin-right: 2%; /* Margine ridotto */
+    padding: 30px; /* Padding più ampio */
+    background-color: white;
+    border-radius: 12px; /* Bordi più arrotondati */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* Ombreggiatura più pronunciata */
+    width: calc(96% - 300px); /* Regola la larghezza per la sidebar */
+    overflow-x: auto; /* Aggiunge scroll orizzontale se necessario */
 }
 
 .table table {
     width: 100%;
-    border-collapse: collapse; /* Rimuove gli spazi tra le celle */
-    font-family: 'Arial', sans-serif;
+    border-collapse: collapse;
+    font-family: 'Roboto', sans-serif; /* Font moderno */
 }
 
 .table th, .table td {
-    padding: 5px 8px; /* Ridotto il padding per rendere le colonne più strette */
+    padding: 12px 15px; /* Padding più ampio */
     text-align: center;
-    border: 1px solid #ddd;
-    font-size: 13px; /* Ridotto il font per una visualizzazione più compatta */
+    border: 1px solid #e0e0e0;
+    font-size: 14px; /* Testo più grande */
 }
 
 .table th {
-    background-color: #4CAF50;
+    background-color: #3498db; /* Blu più vivace */
     color: white;
-    font-weight: bold;
-    border-radius: 5px;
+    font-weight: 500; /* Grassetto leggero */
+    border-radius: 8px; /* Bordi arrotondati */
 }
 
 .table td {
-    background-color: #f9f9f9;
+    background-color: #f8f8f8;
     color: #333;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+    border-radius: 8px; /* Bordi arrotondati */
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .table td:hover {
-    background-color: #f1f1f1;
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+    cursor: pointer;
 }
 
 .table tr:nth-child(even) td {
     background-color: #f2f2f2;
 }
 
-.table tr:hover td {
-    background-color: #f1f1f1;
-    cursor: pointer;
-}
-
-/* Intestazione sticky per la tabella */
 .table thead {
     position: sticky;
     top: 0;
     z-index: 10;
-    background-color: #4CAF50;
+    background-color: #3498db; /* Blu più vivace */
 }
 
 .table caption {
-    font-size: 1.5em;
-    margin: 10px 0;
+    font-size: 1.8em; /* Titolo più grande */
+    margin: 20px 0; /* Margine più ampio */
     color: #333;
+    font-weight: 500; /* Grassetto leggero */
 }
 
-/* Ridurre la larghezza delle colonne specifiche */
+/* Larghezza colonne specifiche */
 .table th:nth-child(1),
 .table td:nth-child(1) {
-    width: 10%; /* Colonna Data */
+    width: 12%; /* Data */
 }
 
 .table th:nth-child(2),
 .table td:nth-child(2) {
-    width: 18%; /* Colonna Apertura */
+    width: 20%; /* Apertura */
 }
 
 .table th:nth-child(3),
 .table td:nth-child(3) {
-    width: 18%; /* Colonna Massimo */
+    width: 20%; /* Massimo */
 }
 
 .table th:nth-child(4),
 .table td:nth-child(4) {
-    width: 18%; /* Colonna Minimo */
+    width: 20%; /* Minimo */
 }
 
 .table th:nth-child(5),
 .table td:nth-child(5) {
-    width: 25%; /* Ridotto il 36% a 25% per la colonna Chiusura */
+    width: 28%; /* Chiusura */
 }
-
-/* Responsive - Aggiungi una barra di scorrimento orizzontale */
-@media (max-width: 768px) {
-    .table {
-        margin-left: 10px;
-        margin-right: 10px;
-        width: calc(100% - 20px); /* Aggiusta la larghezza per gli schermi piccoli */
-    }
-
-    .table table {
-        font-size: 12px;
-    }
-
-    .table th, .table td {
-        padding: 4px 6px;
-    }
-}
-
-@media (max-width: 600px) {
-    .table {
-        padding: 10px;
-        width: calc(100% - 20px); /* Adatta ulteriormente la larghezza per schermi ancora più piccoli */
-    }
-
-    .table table {
-        font-size: 10px;
-    }
-
-    .table th, .table td {
-        padding: 3px 5px;
-    }
-}
-
 
 #forex-chart {
     width: 100%;
-    height: 400px;
+    height: 450px; /* Grafico più alto */
     background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 10px;
+    border-radius: 12px; /* Bordi arrotondati */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* Ombreggiatura pronunciata */
+    padding: 20px; /* Padding più ampio */
+    margin-top: 30px; /* Margine superiore */
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .sidebar {
-        width: 200px;
+        width: 220px;
     }
 
     .main-content {
-        margin-left: 210px;
+        margin-left: 240px;
+    }
+
+    .table {
+        width: calc(100% - 240px);
     }
 }
 
 @media (max-width: 600px) {
     .sidebar {
         width: 100px;
+        padding: 15px;
     }
 
     .main-content {
-        margin-left: 110px;
+        margin-left: 120px;
+        padding: 15px;
     }
 
     #currency-list li {
         font-size: 12px;
-        padding: 8px;
+        padding: 10px;
     }
 
     #forex-chart {
-        height: 300px;
+        height: 350px;
+    }
+
+    .table {
+        width: calc(100% - 120px);
     }
 }

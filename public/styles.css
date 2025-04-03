@@ -6,86 +6,90 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+    font-family: 'Montserrat', sans-serif; /* Cambiato font per un aspetto più moderno */
+    background: linear-gradient(135deg, #667eea, #764ba2); /* Sfumature di colore più moderne */
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     overflow: hidden;
+    color: #333; /* Colore del testo di base */
 }
 
 .container {
-    background-color: white;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255, 0.95); /* Leggera trasparenza per un effetto "frosted glass" */
+    padding: 50px; /* Aumentato il padding per più spazio */
+    border-radius: 16px; /* Bordi più arrotondati */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); /* Ombreggiatura più pronunciata */
     width: 100%;
-    max-width: 400px;
+    max-width: 450px; /* Leggermente più largo */
     text-align: center;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .container:hover {
-    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px); /* Leggero sollevamento al passaggio del mouse */
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
 }
 
 h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #333;
+    font-size: 28px; /* Titolo più grande */
+    margin-bottom: 30px; /* Più spazio sotto il titolo */
+    color: #4a148c; /* Colore del titolo */
+    font-weight: 600; /* Grassetto leggero */
 }
 
 input, select {
     width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    padding: 15px; /* Aumentato il padding */
+    margin: 10px 0; /* Più spazio tra i campi */
+    border: 1px solid #e0e0e0;
+    border-radius: 8px; /* Bordi più arrotondati */
     font-size: 16px;
-    transition: all 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 input:focus, select:focus {
-    border-color: #74ebd5;
+    border-color: #667eea; /* Colore del bordo al focus */
     outline: none;
-    box-shadow: 0 0 8px rgba(116, 235, 213, 0.5);
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.5); /* Ombreggiatura al focus */
 }
 
 button {
     width: 100%;
-    padding: 12px;
-    background-color: #74ebd5;
+    padding: 15px; /* Aumentato il padding */
+    background-color: #667eea; /* Colore del pulsante */
     border: none;
-    border-radius: 6px;
+    border-radius: 8px; /* Bordi più arrotondati */
     color: white;
     font-size: 18px;
+    font-weight: 500; /* Grassetto leggero */
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
-    background-color: #ACB6E5;
+    background-color: #764ba2; /* Colore del pulsante al passaggio del mouse */
 }
 
 button:active {
-    background-color: #74ebd5;
+    background-color: #667eea;
     transform: translateY(2px);
 }
 
 p {
-    margin-top: 20px;
-    color: #555;
+    margin-top: 25px; /* Più spazio sopra il paragrafo */
+    color: #666; /* Colore del testo del paragrafo */
 }
 
 a {
-    color: #74ebd5;
+    color: #667eea;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 600; /* Grassetto leggero */
 }
 
 a:hover {
-    color: #ACB6E5;
+    color: #764ba2;
 }
 
 /* Transizione tra login e registrazione */
@@ -100,6 +104,6 @@ a:hover {
 /* Stili responsive per schermi piccoli */
 @media (max-width: 600px) {
     .container {
-        padding: 20px;
+        padding: 30px; /* Ridotto il padding per schermi piccoli */
     }
 }
