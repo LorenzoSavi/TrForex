@@ -115,6 +115,44 @@ Il wireframe mostra il processo che un utente segue, dalla ricerca del sito su u
 
  ![output della richiesta](img/ReadmeImage1.png)
 
+###Docker Hub
+# TrForex - Setup con Docker
+
+## Introduzione
+TrForex è un'app progettata per giovani investitori che vogliono imparare a fare trading senza rischi, utilizzando un conto demo per Forex e azioni.
+
+## Installazione con Docker
+
+### Requisiti
+- [Docker Desktop](https://www.docker.com/get-started) (o Docker Engine) installato e in esecuzione.
+- Accesso a [Docker Hub](https://hub.docker.com/repository/docker/lorenzosavi/trforex/general).
+
+### Istruzioni per l'installazione
+
+1. **Scarica l'immagine da Docker Hub:**
+   ```bash
+   docker pull lorenzosavi/trforex:latest
+   ```
+2. **Avvia il container con le variabili d'ambiente**  
+   *Sostituisci i placeholder con le tue chiavi API:*
+   ```bash
+   docker run -d -p 3000:3000 --name trforex_container \
+     -e FOREX_API_KEY=LA_TUA_FOREX_API_KEY \
+     -e GOOGLE_CLIENT_ID=IL_TUO_GOOGLE_CLIENT_ID \
+     -e GOOGLE_CLIENT_SECRET=IL_TUO_GOOGLE_CLIENT_SECRET \
+     lorenzosavi/trforex:latest
+   ```
+3. **Accedi all'applicazione**  
+   Apri il browser e vai su:
+   ```bash
+   http://localhost:3000
+   ```
+
+## Link utili
+- Docker Hub: [TrForex](https://hub.docker.com/repository/docker/lorenzosavi/trforex/general)
+- Documentazione Docker: [Guida ufficiale](https://docs.docker.com/get-started/)
+
+
 ### Come Iniziare
 
 Scarica la repo sul tuo computer 
