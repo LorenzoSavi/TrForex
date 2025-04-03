@@ -154,6 +154,19 @@ app.get('/profile', (req, res) => {
     }
 });
 
+wss.on('connection', ws => {
+    visitorCount++;
+    wss.clients.forEach(client => {
+        client.send(visitorCount);
+    });
+
+    ws.on('close', () => {
+        visitorCount--;
+        wss.clients.forEach(client => {
+            client.send(visitorCount);
+        });
+    });
+});
 
 
 app.post('/register', (req, res) => {
