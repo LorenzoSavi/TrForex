@@ -10,6 +10,9 @@ const cookieParser = require('cookie-parser');
 const cron = require('node-cron');
 const axios = require('axios');
 require('dotenv').config();
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const passport = require('passport');
+const fs = require('fs');
 
 const app = express();
 const PORT = 3000;
@@ -90,6 +93,9 @@ const forexDb = new sqlite3.Database(forexDbPath, (err) => {
     }
 });
 
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+
 app.use(cookieParser()); 
 app.use(session({ 
     secret: 'tuo_segreto_sicuro', 
@@ -105,6 +111,49 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new GoogleStrategy({
+    clientID: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    callbackURL: "/auth/google/callback",
+    passReqToCallback: true
+},
+function(req, accessToken, refreshToken, profile, done) {
+    return done(null, profile);
+}));
+
+passport.serializeUser(function(user, done) {
+    done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+    done(null, user);
+});
+
+app.get('/auth/google',
+    passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+    app.get('/auth/google/callback',
+        passport.authenticate('google', { failureRedirect: '/login' }),
+        function(req, res) {
+            req.session.user = req.user; // Salva l'utente nella sessione
+            console.log("sessione salvata per utente google: ", req.user);
+            req.session.user.capitale = 5000;
+            res.redirect('/forex');
+        });
+
+app.get('/profile', (req, res) => {
+    if (req.isAuthenticated()) {
+        res.send(`Benvenuto, ${req.user.displayName}!`);
+    } else {
+        res.redirect('/login');
+    }
+});
+
 
 
 app.post('/register', (req, res) => {
@@ -205,6 +254,11 @@ app.post('/logout', (req, res) => {
     req.session.destroy(() => {
         res.json({ success: true, message: 'Logout effettuato' });
     });
+});
+
+app.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect('/');
 });
 
 app.post('/get-forex-data', (req, res) => {

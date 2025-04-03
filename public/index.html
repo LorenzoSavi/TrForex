@@ -19,6 +19,12 @@
             <button id="loginButton">Accedi</button>
             <p>Non hai un account? <a href="#" onclick="showRegister()">Registrati</a></p>
 
+            <p>Oppure accedi con:</p>
+            <button id="google-login-btn">
+                <img src="img/google-logo.png" alt="Google Logo">
+                Accedi con Google
+            </button>
+
             <button id="testLoginButton">Login di test</button>
         </div>
 
@@ -73,6 +79,30 @@
             transition: all 0.3s ease;
         }
 
+        #google-login-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 10px;
+            background-color: white; /* Sfondo bianco */
+            color: #333; /* Colore del testo grigio scuro */
+            border: 1px solid #ddd; /* Bordo grigio chiaro */
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Leggera ombra */
+            cursor: pointer;
+            transition: box-shadow 0.3s ease;
+            margin-bottom: 20px; /* Aggiungi un margine inferiore per creare spazio */
+        }
+
+        #google-login-btn img {
+            height: 20px;
+            margin-right: 10px;
+        }
+
+        #google-login-btn:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombra più pronunciata al passaggio del mouse */
+        }
         .container:hover {
             box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
         }

@@ -16,6 +16,23 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    const googleLoginBtn = document.getElementById('google-login-btn');
+
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', function() {
+            window.location.href = '/auth/google';
+        });
+    }
+});
+
+
+document.querySelector('a[href="/auth/google"]').addEventListener('click', function(event) {
+    event.preventDefault(); 
+    window.location.href = '/auth/google';
+});
+
+
 document.addEventListener("DOMContentLoaded", () => {
     fetch('/list-forex')
         .then(response => response.json())
