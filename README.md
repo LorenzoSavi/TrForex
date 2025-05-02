@@ -115,7 +115,6 @@ Il wireframe mostra il processo che un utente segue, dalla ricerca del sito su u
 
  ![output della richiesta](img/ReadmeImage1.png)
 
-###Docker Hub
 # TrForex - Setup con Docker
 
 ## Introduzione
