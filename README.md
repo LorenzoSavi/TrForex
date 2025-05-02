@@ -126,6 +126,7 @@ TrForex è un'app progettata per giovani investitori che vogliono imparare a far
 ### Requisiti
 - [Docker Desktop](https://www.docker.com/get-started) (o Docker Engine) installato e in esecuzione.
 - Accesso a [Docker Hub](https://hub.docker.com/repository/docker/lorenzosavi/trforex/general).
+- API da [ForeRateAPI](https://forexrateapi.com/)
 
 ### Istruzioni per l'installazione
 
