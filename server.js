@@ -244,6 +244,7 @@ const requireAuth = (req, res, next) => {
     }
 };
 
+// Nel server.js, modifica la parte del login così:
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
@@ -251,14 +252,21 @@ app.post('/login', (req, res) => {
         return res.status(400).json({ success: false, message: 'Compila tutti i campi' });
     }
 
-    if (email === '@root.itroot' && password === 'root') {
-        req.session.user = { email: email, role: 'root' };
+    // Verifica credenziali admin
+    if (email === 'root@root.it' && password === 'root') {
+        req.session.user = {
+            id: 0,
+            nome: 'Root',
+            isAdmin: true
+        };
         return res.json({
             success: true,
             redirect: '/indexRoot.html',
+            user: { nome: 'Root', isAdmin: true }
         });
     }
 
+    // Se non è admin, procedi con la verifica normale degli utenti
     const query = "SELECT * FROM users WHERE email = ? AND password = ?";
     userDb.get(query, [email, password], (err, user) => {
         if (err) {
@@ -271,7 +279,12 @@ app.post('/login', (req, res) => {
 
         console.log("Login riuscito per:", email);
 
-        req.session.user = { id: user.id, nome: user.nome, capitale: user.capitale };
+        req.session.user = { 
+            id: user.id, 
+            nome: user.nome, 
+            capitale: user.capitale,
+            isAdmin: false
+        };
 
         res.json({
             success: true,
@@ -465,6 +478,68 @@ app.get('/api/transactions', requireAuth, (req, res) => {
     );
 });
 
+app.get('/api/admin/user-positions/:userId', requireAuth, (req, res) => {
+    // Verifica che l'utente sia admin
+    if (!req.session.user.isAdmin) {
+        return res.status(403).json({
+            success: false,
+            message: 'Accesso non autorizzato'
+        });
+    }
+
+    const userId = req.params.userId;
+
+    const query = `
+        SELECT 
+            op.*,
+            u.nome as user_nome,
+            u.cognome as user_cognome,
+            u.capitale as user_capitale
+        FROM open_positions op
+        JOIN users u ON op.user_id = u.id
+        WHERE op.user_id = ? 
+        AND op.status = 'open'
+        ORDER BY op.open_date DESC
+    `;
+
+    userDb.all(query, [userId], (err, positions) => {
+        if (err) {
+            console.error('Errore nel recupero delle posizioni:', err);
+            return res.status(500).json({
+                success: false,
+                message: 'Errore nel recupero delle posizioni'
+            });
+        }
+
+        // Aggiorna i prezzi attuali delle posizioni
+        const updatedPositions = positions.map(position => {
+            const variation = (Math.random() - 0.5) * 0.01;
+            position.current_price = position.entry_price * (1 + variation);
+            position.profit_loss = (position.current_price - position.entry_price) * 
+                                 position.amount * 
+                                 (position.type === 'buy' ? 1 : -1);
+            return position;
+        });
+
+        res.json({
+            success: true,
+            positions: updatedPositions
+        });
+    });
+});
+
+const requireAdmin = (req, res, next) => {
+    if (req.session && req.session.user && req.session.user.isAdmin) {
+        next();
+    } else {
+        res.redirect('/index.html');
+    }
+};
+
+// Proteggi la pagina admin
+app.get('/indexRoot.html', requireAdmin, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'indexRoot.html'));
+});
 
 app.get('/forex', requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'forex.html'));
@@ -788,6 +863,48 @@ app.get('/api/debug/positions-table', requireAuth, (req, res) => {
         });
     });
 });
+
+
+app.get('/users', requireAuth, (req, res) => {
+    // Verifica che l'utente sia admin
+    if (!req.session.user.isAdmin) {
+        return res.status(403).json({
+            success: false,
+            message: 'Accesso non autorizzato'
+        });
+    }
+
+    // Query per ottenere tutti gli utenti con le loro posizioni aperte
+    const query = `
+        SELECT 
+            u.id,
+            u.nome,
+            u.cognome,
+            u.email,
+            u.capitale,
+            COUNT(op.id) as posizioni_aperte
+        FROM users u
+        LEFT JOIN open_positions op ON u.id = op.user_id AND op.status = 'open'
+        GROUP BY u.id, u.nome, u.cognome, u.email, u.capitale
+        ORDER BY u.id ASC
+    `;
+
+    userDb.all(query, [], (err, users) => {
+        if (err) {
+            console.error('Errore nel recupero degli utenti:', err);
+            return res.status(500).json({
+                success: false,
+                message: 'Errore nel recupero degli utenti'
+            });
+        }
+
+        res.json({
+            success: true,
+            users: users
+        });
+    });
+});
+
 
 app.get('/positions', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'positions.html'));

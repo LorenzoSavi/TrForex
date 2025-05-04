@@ -1,15 +1,26 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Root Dashboard</title>
-    <link rel="stylesheet" href="/styles.css">
     <link rel="icon" href="img/root.png" type="image/png" sizes="64x64">
 </head>
+
 <body>
     <div class="container">
         <h1>Benvenuto, Root!</h1>
+        <div class="user-info">
+            <div class="time-info">
+                <p>Current Date and Time (UTC):</p>
+                <p id="currentTime" class="time"></p>
+            </div>
+            <div class="login-info">
+                <p>Current User's Login:</p>
+                <p id="currentUser" class="user">Root</p>
+            </div>
+        </div>
         <h2>Gestione Utenti</h2>
         <table>
             <thead>
@@ -19,6 +30,7 @@
                     <th>Cognome</th>
                     <th>Email</th>
                     <th>Capitale</th>
+                    <th>Posizioni Aperte</th>
                     <th>Azioni</th>
                 </tr>
             </thead>
@@ -28,7 +40,55 @@
             <a href="#" onclick="logout()">Logout</a>
         </div>
     </div>
+
+    <!-- Modal per visualizzare le posizioni -->
+    <div id="positionsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Posizioni Aperte di <span id="modalUserName"></span></h2>
+            <table class="positions-table">
+                <thead>
+                    <tr>
+                        <th>Data Apertura</th>
+                        <th>Valuta</th>
+                        <th>Tipo</th>
+                        <th>Quantità</th>
+                        <th>Prezzo Entrata</th>
+                        <th>Prezzo Attuale</th>
+                        <th>Profitto/Perdita</th>
+                    </tr>
+                </thead>
+                <tbody id="positionsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
     <script>
+        // All'inizio del tuo script
+        document.addEventListener('DOMContentLoaded', function () {
+            // Aggiorna l'utente corrente con "Root"
+            const currentUser = document.getElementById('currentUser');
+            if (currentUser) {
+                currentUser.textContent = 'Root';
+            }
+
+            // Inizializza le funzioni
+            loadUsers();
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+        });
+
+        // Formato data in YYYY-MM-DD HH:MM:SS
+        function formatDateTime(date) {
+            return date.toISOString().slice(0, 19).replace('T', ' ');
+        }
+
+        // Aggiorna l'ora corrente
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = formatDateTime(now);
+        }
+
         // Carica tutti gli utenti
         function loadUsers() {
             fetch('/users')
@@ -36,17 +96,27 @@
                 .then(data => {
                     if (data.success) {
                         const userTable = document.getElementById('userTable');
-                        userTable.innerHTML = ''; // Pulisce la tabella
+                        userTable.innerHTML = '';
                         data.users.forEach(user => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
-                                <td>${user.id}</td>
-                                <td>${user.nome}</td>
-                                <td>${user.cognome}</td>
-                                <td>${user.email}</td>
-                                <td>${user.capitale}</td>
-                                <td><button onclick="deleteUser(${user.id})">Elimina</button></td>
-                            `;
+                        <td>${user.id}</td>
+                        <td>${user.nome}</td>
+                        <td>${user.cognome}</td>
+                        <td>${user.email}</td>
+                        <td>${user.capitale.toFixed(2)} €</td>
+                        <td>
+                            <button class="view-positions" 
+                                    onclick="viewPositions(${user.id}, '${user.nome} ${user.cognome}')">
+                                Visualizza Posizioni (${user.posizioni_aperte || 0})
+                            </button>
+                        </td>
+                        <td>
+                            <button class="delete" onclick="deleteUser(${user.id})">
+                                Elimina
+                            </button>
+                        </td>
+                    `;
                             userTable.appendChild(row);
                         });
                     } else {
@@ -56,31 +126,131 @@
                 .catch(err => console.error('Errore:', err));
         }
 
+        // Visualizza posizioni di un utente
+        function viewPositions(userId, userName) {
+            const modal = document.getElementById('positionsModal');
+            const modalUserName = document.getElementById('modalUserName');
+            const positionsTableBody = document.getElementById('positionsTableBody');
+
+            modalUserName.textContent = userName;
+            positionsTableBody.innerHTML = '<tr><td colspan="7" class="loading">Caricamento posizioni...</td></tr>';
+            modal.style.display = 'block';
+
+            fetch(`/api/admin/user-positions/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.positions.length === 0) {
+                            positionsTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="no-data">
+                                Nessuna posizione aperta
+                            </td>
+                        </tr>
+                    `;
+                            return;
+                        }
+
+                        positionsTableBody.innerHTML = '';
+                        let totalProfitLoss = 0;
+
+                        data.positions.forEach(position => {
+                            const profitLoss = (position.current_price - position.entry_price) *
+                                position.amount *
+                                (position.type === 'buy' ? 1 : -1);
+
+                            totalProfitLoss += profitLoss;
+
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                        <td>${formatDateTime(new Date(position.open_date))}</td>
+                        <td>${position.currency_pair}</td>
+                        <td>${position.type === 'buy' ? 'Acquisto' : 'Vendita'}</td>
+                        <td>${position.amount}</td>
+                        <td>${position.entry_price.toFixed(4)}</td>
+                        <td>${position.current_price.toFixed(4)}</td>
+                        <td class="${profitLoss >= 0 ? 'profit' : 'loss'}">
+                            ${profitLoss.toFixed(2)} €
+                        </td>
+                    `;
+                            positionsTableBody.appendChild(row);
+                        });
+
+                        // Aggiungi riga del totale
+                        const totalRow = document.createElement('tr');
+                        totalRow.innerHTML = `
+                    <td colspan="6" style="text-align: right; font-weight: bold">Profitto/Perdita Totale:</td>
+                    <td class="${totalProfitLoss >= 0 ? 'profit' : 'loss'}" style="font-weight: bold">
+                        ${totalProfitLoss.toFixed(2)} €
+                    </td>
+                `;
+                        positionsTableBody.appendChild(totalRow);
+                    } else {
+                        positionsTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="error">
+                            Errore nel caricamento delle posizioni
+                        </td>
+                    </tr>
+                `;
+                    }
+                })
+                .catch(err => {
+                    console.error('Errore:', err);
+                    positionsTableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="error">
+                        Errore nel caricamento delle posizioni: ${err.message}
+                    </td>
+                </tr>
+            `;
+                });
+        }
+
+        // Gestione chiusura modal
+        document.querySelector('.close').onclick = function () {
+            document.getElementById('positionsModal').style.display = 'none';
+        }
+
+        window.onclick = function (event) {
+            const modal = document.getElementById('positionsModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
         // Elimina un utente
         function deleteUser(userId) {
             if (confirm('Sei sicuro di voler eliminare questo utente?')) {
                 fetch(`/users/${userId}`, {
                     method: 'DELETE',
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        loadUsers(); // Ricarica la lista utenti
-                    } else {
-                        alert('Errore durante l\'eliminazione dell\'utente.');
-                    }
-                })
-                .catch(err => console.error('Errore:', err));
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            loadUsers();
+                        } else {
+                            alert('Errore durante l\'eliminazione dell\'utente.');
+                        }
+                    })
+                    .catch(err => console.error('Errore:', err));
             }
         }
 
         function logout() {
-            alert('Logout effettuato!');
-            window.location.href = '/index.html'; // Torna alla pagina di login
+            fetch('/logout', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '/index.html';
+                    }
+                })
+                .catch(err => {
+                    console.error('Errore durante il logout:', err);
+                    window.location.href = '/index.html';
+                });
         }
-        // Carica gli utenti all'avvio
-        window.onload = loadUsers;
     </script>
 
     <style>
@@ -92,7 +262,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
         }
 
         .container {
@@ -100,8 +270,37 @@
             border-radius: 15px;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            width: 70%;
-            max-width: 800px;
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .time-info,
+        .login-info {
+            text-align: left;
+        }
+
+        .time-info p,
+        .login-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .time,
+        .user {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            color: #2c3e50;
+            font-weight: bold;
         }
 
         h1 {
@@ -122,12 +321,13 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            background: white;
         }
 
         table th,
         table td {
             text-align: left;
-            padding: 10px;
+            padding: 12px;
             border-bottom: 1px solid #ddd;
         }
 
@@ -142,44 +342,158 @@
         }
 
         button {
-            background: #a8e6cf;
-            color: white;
+            padding: 8px 12px;
             border: none;
-            padding: 10px 15px;
             border-radius: 5px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
+            color: white;
         }
 
-        button:hover {
-            background: #81c784;
+        .view-positions {
+            background-color: #3498db;
+        }
+
+        .view-positions:hover {
+            background-color: #2980b9;
         }
 
         button.delete {
-            background: #f44336;
-            transition: background 0.3s ease;
+            background-color: #e74c3c;
         }
 
         button.delete:hover {
-            background: #d32f2f;
+            background-color: #c0392b;
         }
 
         .logout {
             text-align: center;
-            margin-top: 10px;
+            margin-top: 20px;
         }
 
         .logout a {
             text-decoration: none;
             color: #81c784;
-            font-size: 1rem;
             font-weight: bold;
+            transition: color 0.3s ease;
         }
 
         .logout a:hover {
-            text-decoration: underline;
+            color: #4caf50;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 10px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .positions-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .profit {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .loss {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 20px;
+            color: #e74c3c;
+            background-color: #fdf0ed;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                margin: 10px;
+                padding: 15px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            button {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+
+            .time,
+            .user {
+                font-size: 0.9em;
+            }
         }
     </style>
 </body>
+
 </html>
