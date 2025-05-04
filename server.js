@@ -13,6 +13,8 @@ require('dotenv').config();
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const passport = require('passport');
 const fs = require('fs');
+const http = require('http');
+const WebSocket = require('ws');
 
 const app = express();
 const PORT = 3000;
@@ -20,25 +22,46 @@ const PORT = 3000;
 const userDbPath = path.resolve(__dirname, 'database/database-user.db');
 const forexDbPath = path.resolve(__dirname, 'database/database-forex.db');
 
-const WebSocket = require('ws');
-
-const wss = new WebSocket.Server({ port: 8080 });
-
-let visitorCount = 0;
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+let onlineUsers = 0;
 
 wss.on('connection', ws => {
-    visitorCount++;
+    onlineUsers++;
+    // Invia un oggetto JSON invece di un numero
+    const updateMessage = JSON.stringify({
+        type: 'userCount',
+        count: onlineUsers
+    });
+    
+    // Invia a tutti i client
     wss.clients.forEach(client => {
-        client.send(visitorCount);
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(updateMessage);
+        }
     });
 
+    // Quando un utente si disconnette
     ws.on('close', () => {
-        visitorCount--;
+        onlineUsers--;
+        const updateMessage = JSON.stringify({
+            type: 'userCount',
+            count: onlineUsers
+        });
+        
         wss.clients.forEach(client => {
-            client.send(visitorCount);
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(updateMessage);
+            }
         });
     });
+
+    // Gestione errori
+    ws.on('error', (error) => {
+        console.error('WebSocket error:', error);
+    });
 });
+
 
 app.use(cors());
 
@@ -552,11 +575,6 @@ app.get('/indexRoot', (req, res) => {
 const swaggerSpec = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.listen(PORT, () => {
-    console.log(`Server in esecuzione --> http://localhost:${PORT}`);
-    console.log(`Swagger disponibile su --> http://localhost:${PORT}/api-docs`);
-});
-
 const db = new sqlite3.Database('database/database-forex.db');
 
 db.run(`
@@ -912,3 +930,9 @@ app.get('/positions', (req, res) => {
 
 
 cron.schedule('0 0 * * *', fetchAndSaveForexRates);
+
+server.listen(PORT, () => {
+    console.log(`Server HTTP e WebSocket in esecuzione sulla porta ${PORT}`);
+    console.log(`Server in esecuzione --> http://localhost:${PORT}`);
+    console.log(`Swagger disponibile su --> http://localhost:${PORT}/api-docs`);
+});

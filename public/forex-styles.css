@@ -280,3 +280,20 @@ tr:hover td {
     th, td { padding: 10px; }
     .trade-button { padding: 4px 8px; font-size: 12px; }
 }
+
+.online-users-info {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.online-users-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+}

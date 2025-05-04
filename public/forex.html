@@ -28,6 +28,10 @@
         </ul>
 
         <button id="logoutButton">Logout</button>
+
+        <div class="online-users-info">
+            <p>Utenti Online: <span id="onlineUsers">0</span></p>
+        </div>
     </div>
 
     <div class="main-content">
@@ -56,7 +60,6 @@
                     <!-- I dati verranno caricati dinamicamente -->
                 </tbody>
             </table>
-            <!-- Il bottone "Mostra tutto" verrà aggiunto dinamicamente se necessario -->
         </div>
     </div>
 
@@ -101,8 +104,54 @@
         </div>
     </div>
 
+
+
     <script>
+
+        let ws;
+
+        function connectWebSocket() {
+            try {
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${protocol}//${window.location.hostname}:${window.location.port}`;
+
+                console.log('Tentativo di connessione WebSocket a:', wsUrl);
+
+                ws = new WebSocket(wsUrl);
+
+                ws.onopen = function () {
+                    console.log('WebSocket connesso');
+                };
+
+                ws.onmessage = function (event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        console.log('Messaggio WebSocket ricevuto:', data);
+
+                        if (data.type === 'userCount') {
+                            document.getElementById('onlineUsers').textContent = data.count;
+                        }
+                    } catch (e) {
+                        console.error('Errore nel parsing del messaggio WebSocket:', e);
+                    }
+                };
+
+                ws.onclose = function () {
+                    console.log('WebSocket disconnesso, tentativo di riconnessione...');
+                    setTimeout(connectWebSocket, 1000);
+                };
+
+                ws.onerror = function (error) {
+                    console.error('Errore WebSocket:', error);
+                };
+            } catch (e) {
+                console.error('Errore nella creazione del WebSocket:', e);
+            }
+        }
+
+        // Aggiungi questa chiamata all'inizializzazione della pagina
         document.addEventListener('DOMContentLoaded', function () {
+            connectWebSocket();
             // Inizializzazione dati utente
             const nome = localStorage.getItem('nome');
             const capitale = localStorage.getItem('capitale');
@@ -166,6 +215,7 @@
                         `<tr><td colspan="6" class="error">Errore nel caricamento dei dati: ${error.message}</td></tr>`;
                 });
         }
+
 
         function updateTable(data) {
             const forexTable = document.getElementById('forex-table');
