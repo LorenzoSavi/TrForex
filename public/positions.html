@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrForex - Posizioni Aperte</title>
+    <link rel="stylesheet" href="forex-styles.css">
+    <link rel="icon" href="img/logo.png" type="image/png" sizes="64x64">
+</head>
+
+<body>
+    <div class="sidebar">
+        <img id="userImage" src="img/default.png" alt="Profile Picture">
+        <p id="username"></p>
+        <p id="capital"></p>
+
+        <ul id="nav-menu">
+            <li><a href="/forex">Trading</a></li>
+            <li><a href="/positions" class="active">Posizioni Aperte</a></li>
+        </ul>
+
+        <button id="logoutButton">Logout</button>
+    </div>
+
+    <div class="main-content">
+        <h2>Le Tue Posizioni Aperte</h2>
+
+        <div class="table-container">
+            <table class="positions-table">
+                <thead>
+                    <tr>
+                        <th>Data Apertura</th>
+                        <th>Valuta</th>
+                        <th>Tipo</th>
+                        <th>Quantità</th>
+                        <th>Prezzo Entrata</th>
+                        <th>Prezzo Attuale</th>
+                        <th>Profitto/Perdita</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="positions-table-body">
+                    <!-- I dati verranno caricati dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal per la chiusura posizione -->
+    <div class="modal-overlay" id="closePositionModal">
+        <div class="modal">
+            <h3>Chiudi Posizione</h3>
+            <div class="modal-content">
+                <div class="position-details">
+                    <div class="trade-row">
+                        <label>Valuta:</label>
+                        <span id="modalCurrency"></span>
+                    </div>
+                    <div class="trade-row">
+                        <label>Tipo:</label>
+                        <span id="modalType"></span>
+                    </div>
+                    <div class="trade-row">
+                        <label>Quantità:</label>
+                        <span id="modalAmount"></span>
+                    </div>
+                    <div class="trade-row">
+                        <label>Prezzo Entrata:</label>
+                        <span id="modalEntryPrice"></span>
+                    </div>
+                    <div class="trade-row">
+                        <label>Prezzo Attuale:</label>
+                        <span id="modalCurrentPrice"></span>
+                    </div>
+                    <div class="trade-row total">
+                        <label>Profitto/Perdita:</label>
+                        <span id="modalProfitLoss"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="cancel" onclick="closeModal()">Annulla</button>
+                <button class="confirm" onclick="confirmClosePosition()">Conferma Chiusura</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPositionId = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Verifica autenticazione
+            const nome = localStorage.getItem('nome');
+            const capitale = localStorage.getItem('capitale');
+
+            if (!nome || !capitale) {
+                window.location.href = '/';
+                return;
+            }
+
+            // Setup interfaccia utente
+            document.getElementById('username').textContent = nome;
+            document.getElementById('capital').textContent = `Capitale: ${parseFloat(capitale).toFixed(2)} €`;
+
+            // Immagine profilo casuale
+            const randomImage = `/img/profile${Math.floor(Math.random() * 3) + 1}.jpg`;
+            document.getElementById('userImage').src = randomImage;
+
+            // Carica le posizioni aperte
+            loadOpenPositions();
+
+            // Event listener per il logout
+            document.getElementById('logoutButton').addEventListener('click', logout);
+        });
+
+        function loadOpenPositions() {
+            const tableBody = document.getElementById('positions-table-body');
+            tableBody.innerHTML = '<tr><td colspan="8" class="loading">Caricamento posizioni...</td></tr>';
+
+            fetch('/api/positions')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Risposta API positions:', data); // Debug log
+
+                    if (data.success) {
+                        if (!data.positions || data.positions.length === 0) {
+                            tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 20px;">
+                                Nessuna posizione aperta
+                            </td>
+                        </tr>
+                    `;
+                        } else {
+                            updatePositionsTable(data.positions);
+                        }
+                    } else {
+                        throw new Error(data.message || 'Errore nel caricamento delle posizioni');
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore dettagliato:', error);
+                    tableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="error">
+                        Errore nel caricamento delle posizioni: ${error.message}
+                    </td>
+                </tr>
+            `;
+                });
+        }
+
+        function updatePositionsTable(positions) {
+            const tableBody = document.getElementById('positions-table-body');
+
+            if (positions.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 20px;">
+                            Nessuna posizione aperta
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = '';
+            positions.forEach(position => {
+                const profitLoss = calculateProfitLoss(position);
+                const tr = document.createElement('tr');
+
+                tr.innerHTML = `
+                    <td>${new Date(position.open_date).toLocaleString()}</td>
+                    <td>${position.currency_pair}</td>
+                    <td>${position.type === 'buy' ? 'Acquisto' : 'Vendita'}</td>
+                    <td>${position.amount}</td>
+                    <td>${position.entry_price.toFixed(4)}</td>
+                    <td>${position.current_price.toFixed(4)}</td>
+                    <td class="${profitLoss >= 0 ? 'profit' : 'loss'}">
+                        ${profitLoss.toFixed(2)} €
+                    </td>
+                    <td>
+                        <button class="close-position-button" 
+                                onclick="openClosePositionModal(${position.id})">
+                            Chiudi
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function calculateProfitLoss(position) {
+            const multiplier = position.type === 'buy' ? 1 : -1;
+            return (position.current_price - position.entry_price) *
+                position.amount * multiplier;
+        }
+
+        function openClosePositionModal(positionId) {
+            currentPositionId = positionId;
+
+            fetch(`/api/position/${positionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const position = data.position;
+                        document.getElementById('modalCurrency').textContent = position.currency_pair;
+                        document.getElementById('modalType').textContent =
+                            position.type === 'buy' ? 'Acquisto' : 'Vendita';
+                        document.getElementById('modalAmount').textContent = position.amount;
+                        document.getElementById('modalEntryPrice').textContent =
+                            position.entry_price.toFixed(4);
+                        document.getElementById('modalCurrentPrice').textContent =
+                            position.current_price.toFixed(4);
+
+                        const profitLoss = calculateProfitLoss(position);
+                        const profitLossElement = document.getElementById('modalProfitLoss');
+                        profitLossElement.textContent = `${profitLoss.toFixed(2)} €`;
+                        profitLossElement.className = profitLoss >= 0 ? 'profit' : 'loss';
+
+                        document.getElementById('closePositionModal').style.display = 'flex';
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert('Errore nel recupero dei dettagli della posizione');
+                });
+        }
+
+        function closeModal() {
+            document.getElementById('closePositionModal').style.display = 'none';
+            currentPositionId = null;
+        }
+
+        function confirmClosePosition() {
+            if (!currentPositionId) return;
+
+            fetch(`/api/position/${currentPositionId}/close`, {
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Posizione chiusa con successo!');
+                        localStorage.setItem('capitale', data.newBalance);
+                        document.getElementById('capital').textContent =
+                            `Capitale: ${data.newBalance.toFixed(2)} €`;
+                        loadOpenPositions();
+                    } else {
+                        throw new Error(data.message || 'Errore durante la chiusura della posizione');
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert(`Errore durante la chiusura della posizione: ${error.message}`);
+                })
+                .finally(() => {
+                    closeModal();
+                });
+        }
+
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        localStorage.removeItem('nome');
+                        localStorage.removeItem('capitale');
+                        window.location.href = '/';
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore durante il logout:', error);
+                    alert('Errore durante il logout');
+                });
+        }
+    </script>
+</body>
+
+</html>

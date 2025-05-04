@@ -4,11 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forex</title>
+    <title>TrForex - Trading Platform</title>
     <link rel="stylesheet" href="forex-styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" href="img/logo.png" type="image/png" sizes="64x64">
-
 </head>
 
 <body>
@@ -17,100 +16,136 @@
         <p id="username"></p>
         <p id="capital"></p>
 
+        <ul id="nav-menu">
+            <li><a href="#" class="active">Trading</a></li>
+            <li><a href="/positions">Posizioni Aperte</a></li>
+        </ul>
+
         <ul id="currency-list">
             <li>EUR/USD</li>
             <li>GBP/USD</li>
             <li>USD/JPY</li>
         </ul>
+
+        <button id="logoutButton">Logout</button>
     </div>
 
     <div class="main-content">
         <h2 id="currency-title">TrForex</h2>
-        <div id="forex-data">
+
+        <!-- Grafico -->
+        <div class="chart-container">
+            <canvas id="forexChart"></canvas>
         </div>
 
+        <!-- Tabella dati -->
+        <div class="table-container">
+            <table>
+                <caption>Forex Data</caption>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Apertura</th>
+                        <th>Massimo</th>
+                        <th>Minimo</th>
+                        <th>Chiusura</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="forex-table">
+                    <!-- I dati verranno caricati dinamicamente -->
+                </tbody>
+            </table>
+            <!-- Il bottone "Mostra tutto" verrà aggiunto dinamicamente se necessario -->
+        </div>
     </div>
-    <div class="table">
-        <table>
-            <caption>Forex Data</caption>
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Apertura</th>
-                    <th>Massimo</th>
-                    <th>Minimo</th>
-                    <th>Chiusura</th>
-                </tr>
-            </thead>
-            <tbody id="forex-table">
-            </tbody>
-        </table>
 
-        <main id="main">
-            <canvas id="forexChart" width="800" height="400"></canvas>
-        </main>
-    </div>
-    <div style="position: absolute; top: 10px; right: 10px; display: flex; align-items: center;">
-        <p style="margin-right: 10px;">Visitatori online: <span id="visitor-count">0</span></p>
-        <button id="logoutButton" style="padding: 8px 12px; background-color: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">Logout</button>
+    <!-- Modal per il Trading -->
+    <div class="modal-overlay" id="tradeModal">
+        <div class="modal">
+            <h3>Esegui Trading</h3>
+            <div class="modal-content">
+                <div class="trade-details">
+                    <div class="trade-row">
+                        <label>Coppia Valutaria:</label>
+                        <span id="modalCurrencyPair"></span>
+                    </div>
+                    <div class="trade-row">
+                        <label>Prezzo Attuale:</label>
+                        <span id="modalCurrentPrice"></span>
+                    </div>
+                    <div class="trade-row">
+                        <label>Operazione:</label>
+                        <select id="modalTradeType">
+                            <option value="buy">Acquisto</option>
+                            <option value="sell">Vendita</option>
+                        </select>
+                    </div>
+                    <div class="trade-row">
+                        <label>Quantità:</label>
+                        <input type="number" id="modalAmount" min="0.01" step="0.01">
+                    </div>
+                    <div class="trade-row total">
+                        <label>Totale Operazione:</label>
+                        <span id="modalTotal">0.00 €</span>
+                    </div>
+                    <div class="capital-info">
+                        <p>Capitale Disponibile: <span id="modalCapital"></span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="cancel" onclick="closeTradeModal()">Annulla</button>
+                <button class="confirm" onclick="confirmTrade()">Conferma</button>
+            </div>
+        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Recupera nome e capitale dal localStorage
+            // Inizializzazione dati utente
             const nome = localStorage.getItem('nome');
             const capitale = localStorage.getItem('capitale');
 
-            // Se i dati non esistono, reindirizza al login
             if (!nome || !capitale) {
                 alert('Sessione scaduta. Effettua nuovamente il login.');
                 window.location.href = '/';
                 return;
             }
 
-            
-
+            // Setup interfaccia utente
             document.getElementById('username').textContent = nome;
-            document.getElementById('capital').textContent = `Capitale: ${capitale}`;
+            document.getElementById('capital').textContent = `Capitale: ${parseFloat(capitale).toFixed(2)} €`;
 
-            const randomImage = `/img/profile${Math.floor(Math.random() * 3) + 1}.jpg`; 
+            // Immagine profilo casuale
+            const randomImage = `/img/profile${Math.floor(Math.random() * 3) + 1}.jpg`;
             document.getElementById('userImage').src = randomImage;
 
-            const logoutButton = document.getElementById('logoutButton');
-            logoutButton.addEventListener('click', function() {
-                fetch('/logout', { method: 'POST' })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            localStorage.removeItem('nome');
-                            localStorage.removeItem('capitale');
-                            window.location.href = '/index.html'; 
-                        }
-                    });
+            // Carica i dati iniziali
+            fetchForexData('EUR/USD');
+
+            // Event Listeners
+            document.getElementById('currency-list').addEventListener('click', function (e) {
+                if (e.target.tagName === 'LI') {
+                    const selectedCurrency = e.target.textContent;
+                    document.getElementById('currency-title').textContent = selectedCurrency;
+                    fetchForexData(selectedCurrency);
+                }
             });
-        });
 
-        const socket = new WebSocket('ws://localhost:8080');
+            document.getElementById('logoutButton').addEventListener('click', logout);
 
-        socket.onmessage = event => {
-        document.getElementById('visitor-count').textContent = event.data;
-        };
-
-        const currencyList = document.getElementById('currency-list');
-        const forexTable = document.getElementById('forex-table');
-        const candlestickChart = document.getElementById('candlestick-chart');
-
-        let chartInstance;
-
-        currencyList.addEventListener('click', function (e) {
-            if (e.target.tagName === 'LI') {
-                const selectedCurrency = e.target.textContent;
-                document.getElementById('currency-title').textContent = selectedCurrency;
-                fetchForexData(selectedCurrency);
-            }
+            // WebSocket per i visitatori online
+            const socket = new WebSocket('ws://localhost:8080');
+            socket.onmessage = event => {
+                document.getElementById('visitor-count').textContent = event.data;
+            };
         });
 
         function fetchForexData(valuta) {
+            document.getElementById('forex-table').innerHTML =
+                '<tr><td colspan="6" class="loading">Caricamento dati...</td></tr>';
+
             fetch('/get-forex-data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -120,182 +155,192 @@
                 .then(result => {
                     if (result.success) {
                         updateTable(result.data);
-                        renderChart(result.data);
+                        updateChart(result.data);
                     } else {
-                        alert(result.message);
+                        throw new Error(result.message);
                     }
                 })
-                .catch(error => console.error('Errore:', error));
+                .catch(error => {
+                    console.error('Errore:', error);
+                    document.getElementById('forex-table').innerHTML =
+                        `<tr><td colspan="6" class="error">Errore nel caricamento dei dati: ${error.message}</td></tr>`;
+                });
         }
 
         function updateTable(data) {
+            const forexTable = document.getElementById('forex-table');
             forexTable.innerHTML = '';
-            data.forEach(row => {
+
+            // Mostra solo i primi 5 dati
+            const initialData = data.slice(0, 5);
+
+            initialData.forEach((row, index) => {
                 const tr = document.createElement('tr');
+
+                // Calcola la variazione percentuale
+                const priceChange = row.close - row.open;
+                const priceChangeClass = priceChange >= 0 ? 'value-up' : 'value-down';
+
                 tr.innerHTML = `
-                <td>${row.giorno}</td>
-                <td>${row.open}</td>
-                <td>${row.massimo}</td>
-                <td>${row.minimo}</td>
-                <td>${row.close}</td>
-            `;
+            <td>${formatDate(row.giorno)}</td>
+            <td class="${row.close > row.open ? 'value-up' : 'value-down'}">
+                ${formatNumber(row.open)}
+            </td>
+            <td>${formatNumber(row.massimo)}</td>
+            <td>${formatNumber(row.minimo)}</td>
+            <td class="${priceChangeClass}">
+                ${formatNumber(row.close)}
+                <small class="${priceChangeClass}">
+                    ${priceChange >= 0 ? '▲' : '▼'} 
+                    ${Math.abs((priceChange / row.open * 100)).toFixed(2)}%
+                </small>
+            </td>
+            <td>
+                <button class="trade-button" onclick="openTradeModal('${row.valuta}', ${row.close})">
+                    Trade
+                </button>
+            </td>
+        `;
                 forexTable.appendChild(tr);
+            });
+
+            // Aggiungi il bottone "Mostra tutto" se ci sono più dati
+            if (data.length > 5) {
+                const showMoreRow = document.createElement('tr');
+                showMoreRow.innerHTML = `
+            <td colspan="6" class="show-more-cell">
+                <button id="showMoreBtn" class="show-more-button">
+                    Mostra altri ${data.length - 5} record
+                </button>
+            </td>
+        `;
+                forexTable.appendChild(showMoreRow);
+            }
+        }
+
+        // Funzioni di supporto
+        function formatNumber(num) {
+            return num.toFixed(4);
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('it-IT', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
             });
         }
 
-        // Funzione per creare il grafico
-        function createChart(dates, openData, closeData) {
+        function updateChart(data) {
             const ctx = document.getElementById('forexChart').getContext('2d');
 
-            // Distruggi il grafico precedente (se esiste)
             if (window.chartInstance) {
                 window.chartInstance.destroy();
             }
 
-            // Crea il nuovo grafico
             window.chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: dates, // Date
+                    labels: data.map(row => row.giorno).reverse(),
                     datasets: [
                         {
-                            label: 'Apertura',
-                            data: openData,
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 2,
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Chiusura',
-                            data: closeData,
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 2,
-                            tension: 0.3
+                            label: 'Prezzo di Chiusura',
+                            data: data.map(row => row.close).reverse(),
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
                         }
                     ]
                 },
                 options: {
                     responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Andamento Prezzo'
+                        }
+                    },
                     scales: {
-                        x: {
-                            title: { display: true, text: 'Data' }
-                        },
                         y: {
-                            title: { display: true, text: 'Valore' }
+                            beginAtZero: false
                         }
                     }
                 }
             });
         }
 
-        // Funzione per caricare i dati dal server
-        function loadCurrencyData(currency) {
-            fetch('/forex/filter/:valuta')
+        function openTradeModal(currency, price) {
+            const modal = document.getElementById('tradeModal');
+            document.getElementById('modalCurrencyPair').textContent = currency;
+            document.getElementById('modalCurrentPrice').textContent = price.toFixed(4);
+            document.getElementById('modalAmount').value = '';
+            document.getElementById('modalTotal').textContent = '0.00 €';
+            document.getElementById('modalCapital').textContent =
+                document.getElementById('capital').textContent.split(': ')[1];
+
+            modal.style.display = 'flex';
+
+            // Aggiorna il totale quando cambia la quantità
+            document.getElementById('modalAmount').addEventListener('input', updateModalTotal);
+        }
+
+        function updateModalTotal() {
+            const amount = parseFloat(document.getElementById('modalAmount').value) || 0;
+            const price = parseFloat(document.getElementById('modalCurrentPrice').textContent);
+            document.getElementById('modalTotal').textContent = `${(amount * price).toFixed(2)} €`;
+        }
+
+        function closeTradeModal() {
+            document.getElementById('tradeModal').style.display = 'none';
+        }
+
+        function confirmTrade() {
+            const tradeData = {
+                currency_pair: document.getElementById('modalCurrencyPair').textContent,
+                type: document.getElementById('modalTradeType').value,
+                amount: parseFloat(document.getElementById('modalAmount').value),
+                price: parseFloat(document.getElementById('modalCurrentPrice').textContent)
+            };
+
+            fetch('/api/trade', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(tradeData)
+            })
                 .then(response => response.json())
                 .then(data => {
-                    createChart(data.dates, data.open, data.close);
+                    if (data.success) {
+                        alert('Operazione completata con successo!');
+                        document.getElementById('capital').textContent =
+                            `Capitale: ${data.newBalance.toFixed(2)} €`;
+                        localStorage.setItem('capitale', data.newBalance);
+                    } else {
+                        alert(data.message || 'Errore durante l\'operazione');
+                    }
+                    closeTradeModal();
                 })
-                .catch(err => console.error('Errore nel caricamento dei dati:', err));
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert('Errore durante l\'operazione');
+                    closeTradeModal();
+                });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const currencyList = document.getElementById('currency-list');
-            const forexTable = document.getElementById('forex-table');
-            const currencyTitle = document.getElementById('currency-title');
-            const chartCanvas = document.getElementById('forexChart');
-            let chartInstance;
-
-            // Funzione per creare il grafico
-            function createChart(dates, openData, closeData) {
-                const ctx = chartCanvas.getContext('2d');
-
-                // Distruggi il grafico precedente (se esiste)
-                if (chartInstance) {
-                    chartInstance.destroy();
-                }
-
-                // Crea il nuovo grafico
-                chartInstance = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: dates,
-                        datasets: [
-                            {
-                                label: 'Apertura',
-                                data: openData,
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                borderWidth: 2,
-                                tension: 0.3
-                            },
-                            {
-                                label: 'Chiusura',
-                                data: closeData,
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 2,
-                                tension: 0.3
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            x: {
-                                title: { display: true, text: 'Data' }
-                            },
-                            y: {
-                                title: { display: true, text: 'Valore' }
-                            }
-                        }
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        localStorage.removeItem('nome');
+                        localStorage.removeItem('capitale');
+                        window.location.href = '/';
                     }
+                })
+                .catch(error => {
+                    console.error('Errore durante il logout:', error);
+                    alert('Errore durante il logout');
                 });
-            }
-
-            // Funzione per aggiornare la tabella
-            function updateTable(data) {
-                forexTable.innerHTML = '';
-                data.forEach(row => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                <td>${row.date}</td>
-                <td>${row.open}</td>
-                <td>${row.high}</td>
-                <td>${row.low}</td>
-                <td>${row.close}</td>
-            `;
-                    forexTable.appendChild(tr);
-                });
-            }
-
-            // Funzione per caricare i dati
-            function loadCurrencyData(currency) {
-                fetch(`/forex/:valuta`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Aggiorna tabella e grafico
-                        updateTable(data.rows);
-                        createChart(data.dates, data.opens, data.closes);
-                    })
-                    .catch(err => console.error('Errore nel caricamento dei dati:', err));
-            }
-
-            // Gestione click sulla lista delle valute
-            currencyList.addEventListener('click', event => {
-                const target = event.target;
-                if (target.tagName === 'LI') {
-                    const currency = target.getAttribute('data-currency');
-                    currencyTitle.textContent = target.textContent;
-                    loadCurrencyData(currency);
-                }
-            });
-
-            // Caricamento iniziale
-            loadCurrencyData('EURUSD');
-        });
-
-
-
-
-
+        }
     </script>
 </body>
 
