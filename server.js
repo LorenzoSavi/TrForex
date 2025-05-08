@@ -190,15 +190,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new GoogleStrategy({
-    clientID: GOOGLE_CLIENT_ID,
-    clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: "/auth/google/callback",
-    passReqToCallback: true
-},
-    function (req, accessToken, refreshToken, profile, done) {
+// Modified Passport configuration
+if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
+    passport.use(new GoogleStrategy({
+        clientID: GOOGLE_CLIENT_ID,
+        clientSecret: GOOGLE_CLIENT_SECRET,
+        callbackURL: "/auth/google/callback",
+        passReqToCallback: true
+    },
+    function(req, accessToken, refreshToken, profile, done) {
         return done(null, profile);
     }));
+} else {
+    console.warn('Google OAuth credentials missing. Google login will not be available.');
+}
 
 passport.serializeUser(function (user, done) {
     done(null, user);
@@ -208,17 +213,24 @@ passport.deserializeUser(function (user, done) {
     done(null, user);
 });
 
-app.get('/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] }));
+// Modify Google auth routes to check if strategy is configured
+app.get('/auth/google', (req, res, next) => {
+    if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+        return res.status(503).send('Google authentication is not configured');
+    }
+    passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+});
 
-app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login' }),
-    function (req, res) {
-        req.session.user = req.user;
-        console.log("sessione salvata per utente google: ", req.user);
-        req.session.user.capitale = 5000;
-        res.redirect('/forex');
-    });
+app.get('/auth/google/callback', (req, res, next) => {
+    if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+        return res.redirect('/login');
+    }
+    passport.authenticate('google', { failureRedirect: '/login' })(req, res, next);
+}, function(req, res) {
+    req.session.user = req.user;
+    req.session.user.capitale = 5000;
+    res.redirect('/forex');
+});
 
 app.get('/profile', (req, res) => {
     if (req.isAuthenticated()) {

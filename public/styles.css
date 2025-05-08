@@ -107,3 +107,82 @@ a:hover {
         padding: 30px; /* Ridotto il padding per schermi piccoli */
     }
 }
+
+/* Enhanced Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+        padding: 30px 20px;
+        margin: 20px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
+    input, select, button {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    #google-login-btn {
+        font-size: 14px;
+    }
+
+    #google-login-btn img {
+        height: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        width: 95%;
+        padding: 20px 15px;
+        margin: 10px;
+    }
+
+    h2 {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+    input, select, button {
+        padding: 10px;
+        font-size: 13px;
+        margin: 6px 0;
+    }
+
+    p {
+        font-size: 13px;
+        margin-top: 15px;
+    }
+
+    #google-login-btn {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    #google-login-btn img {
+        height: 14px;
+        margin-right: 6px;
+    }
+
+    #swaggerButton {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+@media (max-height: 600px) {
+    .container {
+        transform: scale(0.9);
+    }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+    body {
+        height: auto;
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+}

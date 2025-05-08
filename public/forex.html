@@ -5,129 +5,151 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TrForex - Trading Platform</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="forex-styles.css">
+    
+    <!-- Chart.js e plugins -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+    
     <link rel="icon" href="img/logo.png" type="image/png" sizes="64x64">
 </head>
 
 <body>
-    <div class="sidebar">
-        <img id="userImage" src="img/default.png" alt="Profile Picture">
-        <p id="username"></p>
-        <p id="capital"></p>
-
-        <ul id="nav-menu">
-            <li><a href="#" class="active">Trading</a></li>
-            <li><a href="/positions">Posizioni Aperte</a></li>
+    <div class="sidebar animate__animated animate__slideInLeft">
+        <img id="userImage" src="img/default.png" alt="Profile Picture" class="animate__animated animate__pulse animate__infinite">
+        <p id="username"><i class="fas fa-user"></i> <span></span></p>
+        <p id="capital"><i class="fas fa-wallet"></i> <span></span></p>
+        <ul id="nav-menu" class="nav flex-column">
+            <li class="nav-item">
+                <a href="#" class="nav-link active">
+                    <i class="fas fa-chart-line"></i> Trading
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/positions" class="nav-link">
+                    <i class="fas fa-list-ul"></i> Posizioni Aperte
+                </a>
+            </li>
         </ul>
-
-        <ul id="currency-list">
-            <li>EUR/USD</li>
-            <li>GBP/USD</li>
-            <li>USD/JPY</li>
+        <ul id="currency-list" class="list-group">
+            <li class="list-group-item"><i class="fas fa-euro-sign"></i> EUR/USD</li>
+            <li class="list-group-item"><i class="fas fa-pound-sign"></i> GBP/USD</li>
+            <li class="list-group-item"><i class="fas fa-yen-sign"></i> USD/JPY</li>
         </ul>
-
-        <button id="logoutButton">Logout</button>
-
+        <button id="logoutButton" class="btn btn-danger">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
         <div class="online-users-info">
             <p>Utenti Online: <span id="onlineUsers">0</span></p>
         </div>
     </div>
-
-    <div class="main-content">
-        <h2 id="currency-title">TrForex</h2>
-
-        <!-- Grafico -->
-        <div class="chart-container">
-            <canvas id="forexChart"></canvas>
-        </div>
-
-        <!-- Tabella dati -->
-        <div class="table-container">
-            <table>
-                <caption>Forex Data</caption>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Apertura</th>
-                        <th>Massimo</th>
-                        <th>Minimo</th>
-                        <th>Chiusura</th>
-                        <th>Azioni</th>
-                    </tr>
-                </thead>
-                <tbody id="forex-table">
-                    <!-- I dati verranno caricati dinamicamente -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Modal per il Trading -->
-    <div class="modal-overlay" id="tradeModal">
-        <div class="modal">
-            <h3>Esegui Trading</h3>
-            <div class="modal-content">
-                <div class="trade-details">
-                    <div class="trade-row">
-                        <label>Coppia Valutaria:</label>
-                        <span id="modalCurrencyPair"></span>
-                    </div>
-                    <div class="trade-row">
-                        <label>Prezzo Attuale:</label>
-                        <span id="modalCurrentPrice"></span>
-                    </div>
-                    <div class="trade-row">
-                        <label>Operazione:</label>
-                        <select id="modalTradeType">
-                            <option value="buy">Acquisto</option>
-                            <option value="sell">Vendita</option>
-                        </select>
-                    </div>
-                    <div class="trade-row">
-                        <label>Quantità:</label>
-                        <input type="number" id="modalAmount" min="0.01" step="0.01">
-                    </div>
-                    <div class="trade-row total">
-                        <label>Totale Operazione:</label>
-                        <span id="modalTotal">0.00 €</span>
-                    </div>
-                    <div class="capital-info">
-                        <p>Capitale Disponibile: <span id="modalCapital"></span></p>
+    <div class="main-content container-fluid">
+        <h2 id="currency-title" class="animate__animated animate__fadeIn">
+            <i class="fas fa-chart-bar"></i> TrForex
+        </h2>
+        <div class="row">
+            <div class="col-12">
+                <div class="chart-container card animate__animated animate__fadeInUp">
+                    <div class="card-body">
+                        <canvas id="forexChart"></canvas>
                     </div>
                 </div>
             </div>
-            <div class="modal-actions">
-                <button class="cancel" onclick="closeTradeModal()">Annulla</button>
-                <button class="confirm" onclick="confirmTrade()">Conferma</button>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="table-container card animate__animated animate__fadeInUp">
+                    <div class="card-body">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th><i class="far fa-calendar-alt"></i> Data</th>
+                                    <th><i class="fas fa-door-open"></i> Apertura</th>
+                                    <th><i class="fas fa-arrow-up"></i> Massimo</th>
+                                    <th><i class="fas fa-arrow-down"></i> Minimo</th>
+                                    <th><i class="fas fa-door-closed"></i> Chiusura</th>
+                                    <th><i class="fas fa-cogs"></i> Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody id="forex-table">
+                                <!-- I dati verranno caricati dinamicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-
-
+    <!-- Modal per il Trading -->
+    <div class="modal fade" id="tradeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content animate__animated animate__zoomIn">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-exchange-alt"></i> Esegui Trading</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-content">
+                    <div class="trade-details">
+                        <div class="trade-row">
+                            <label>Coppia Valutaria:</label>
+                            <span id="modalCurrencyPair"></span>
+                        </div>
+                        <div class="trade-row">
+                            <label>Prezzo Attuale:</label>
+                            <span id="modalCurrentPrice"></span>
+                        </div>
+                        <div class="trade-row">
+                            <label>Operazione:</label>
+                            <select id="modalTradeType" class="form-select">
+                                <option value="buy">Acquisto</option>
+                                <option value="sell">Vendita</option>
+                            </select>
+                        </div>
+                        <div class="trade-row">
+                            <label>Quantità:</label>
+                            <input type="number" id="modalAmount" min="0.01" step="0.01" class="form-control">
+                        </div>
+                        <div class="trade-row total">
+                            <label>Totale Operazione:</label>
+                            <span id="modalTotal">0.00 €</span>
+                        </div>
+                        <div class="capital-info">
+                            <p>Capitale Disponibile: <span id="modalCapital"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeTradeModal()">Annulla</button>
+                    <button class="btn btn-primary" onclick="confirmTrade()">Conferma</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS e Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <script>
-
         let ws;
-
         function connectWebSocket() {
             try {
                 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
                 const wsUrl = `${protocol}//${window.location.hostname}:${window.location.port}`;
-
                 console.log('Tentativo di connessione WebSocket a:', wsUrl);
-
                 ws = new WebSocket(wsUrl);
-
                 ws.onopen = function () {
                     console.log('WebSocket connesso');
                 };
-
                 ws.onmessage = function (event) {
                     try {
                         const data = JSON.parse(event.data);
                         console.log('Messaggio WebSocket ricevuto:', data);
-
                         if (data.type === 'userCount') {
                             document.getElementById('onlineUsers').textContent = data.count;
                         }
@@ -135,12 +157,10 @@
                         console.error('Errore nel parsing del messaggio WebSocket:', e);
                     }
                 };
-
                 ws.onclose = function () {
                     console.log('WebSocket disconnesso, tentativo di riconnessione...');
                     setTimeout(connectWebSocket, 1000);
                 };
-
                 ws.onerror = function (error) {
                     console.error('Errore WebSocket:', error);
                 };
@@ -148,32 +168,20 @@
                 console.error('Errore nella creazione del WebSocket:', e);
             }
         }
-
-        // Aggiungi questa chiamata all'inizializzazione della pagina
         document.addEventListener('DOMContentLoaded', function () {
             connectWebSocket();
-            // Inizializzazione dati utente
             const nome = localStorage.getItem('nome');
             const capitale = localStorage.getItem('capitale');
-
             if (!nome || !capitale) {
                 alert('Sessione scaduta. Effettua nuovamente il login.');
                 window.location.href = '/';
                 return;
             }
-
-            // Setup interfaccia utente
             document.getElementById('username').textContent = nome;
             document.getElementById('capital').textContent = `Capitale: ${parseFloat(capitale).toFixed(2)} €`;
-
-            // Immagine profilo casuale
             const randomImage = `/img/profile${Math.floor(Math.random() * 3) + 1}.jpg`;
             document.getElementById('userImage').src = randomImage;
-
-            // Carica i dati iniziali
             fetchForexData('EUR/USD');
-
-            // Event Listeners
             document.getElementById('currency-list').addEventListener('click', function (e) {
                 if (e.target.tagName === 'LI') {
                     const selectedCurrency = e.target.textContent;
@@ -181,20 +189,11 @@
                     fetchForexData(selectedCurrency);
                 }
             });
-
             document.getElementById('logoutButton').addEventListener('click', logout);
-
-            // WebSocket per i visitatori online
-            const socket = new WebSocket('ws://localhost:8080');
-            socket.onmessage = event => {
-                document.getElementById('visitor-count').textContent = event.data;
-            };
         });
-
         function fetchForexData(valuta) {
             document.getElementById('forex-table').innerHTML =
                 '<tr><td colspan="6" class="loading">Caricamento dati...</td></tr>';
-
             fetch('/get-forex-data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -215,73 +214,77 @@
                         `<tr><td colspan="6" class="error">Errore nel caricamento dei dati: ${error.message}</td></tr>`;
                 });
         }
-
-
         function updateTable(data) {
             const forexTable = document.getElementById('forex-table');
             forexTable.innerHTML = '';
-
-            // Mostra solo i primi 5 dati
+            
+            // Inizialmente mostra solo i primi 5 record
             const initialData = data.slice(0, 5);
+            renderTableRows(initialData);
 
-            initialData.forEach((row, index) => {
+            if (data.length > 5) {
+                const showMoreRow = document.createElement('tr');
+                showMoreRow.innerHTML = `
+                    <td colspan="6" class="show-more-cell">
+                        <button id="showMoreBtn" class="show-more-button btn btn-secondary">
+                            Mostra altri ${data.length - 5} record
+                        </button>
+                    </td>
+                `;
+                forexTable.appendChild(showMoreRow);
+
+                // Aggiungiamo l'event listener per il bottone
+                document.getElementById('showMoreBtn').addEventListener('click', function() {
+                    // Rimuovi il bottone "Mostra altri"
+                    this.closest('tr').remove();
+                    // Renderizza i record rimanenti
+                    renderTableRows(data.slice(5));
+                });
+            }
+        }
+
+        // Funzione helper per renderizzare le righe della tabella
+        function renderTableRows(rows) {
+            const forexTable = document.getElementById('forex-table');
+            rows.forEach(row => {
                 const tr = document.createElement('tr');
-
-                // Calcola la variazione percentuale
                 const priceChange = row.close - row.open;
                 const priceChangeClass = priceChange >= 0 ? 'value-up' : 'value-down';
 
                 tr.innerHTML = `
-            <td>${formatDate(row.giorno)}</td>
-            <td class="${row.close > row.open ? 'value-up' : 'value-down'}">
-                ${formatNumber(row.open)}
-            </td>
-            <td>${formatNumber(row.massimo)}</td>
-            <td>${formatNumber(row.minimo)}</td>
-            <td class="${priceChangeClass}">
-                ${formatNumber(row.close)}
-                <small class="${priceChangeClass}">
-                    ${priceChange >= 0 ? '▲' : '▼'} 
-                    ${Math.abs((priceChange / row.open * 100)).toFixed(2)}%
-                </small>
-            </td>
-            <td>
-                <button class="trade-button" onclick="openTradeModal('${row.valuta}', ${row.close})">
-                    Trade
-                </button>
-            </td>
-        `;
+                    <td>${formatDate(row.giorno)}</td>
+                    <td class="${row.close > row.open ? 'value-up' : 'value-down'}">
+                        ${formatNumber(row.open)}
+                    </td>
+                    <td>${formatNumber(row.massimo)}</td>
+                    <td>${formatNumber(row.minimo)}</td>
+                    <td class="${priceChangeClass}">
+                        ${formatNumber(row.close)}
+                        <small class="${priceChangeClass}">
+                            ${priceChange >= 0 ? '▲' : '▼'} 
+                            ${Math.abs((priceChange / row.open * 100)).toFixed(2)}%
+                        </small>
+                    </td>
+                    <td>
+                        <button class="trade-button btn btn-primary" onclick="openTradeModal('${row.valuta}', ${row.close})">
+                            <i class="fas fa-exchange-alt"></i> Trade
+                        </button>
+                    </td>
+                `;
                 forexTable.appendChild(tr);
             });
-
-            // Aggiungi il bottone "Mostra tutto" se ci sono più dati
-            if (data.length > 5) {
-                const showMoreRow = document.createElement('tr');
-                showMoreRow.innerHTML = `
-            <td colspan="6" class="show-more-cell">
-                <button id="showMoreBtn" class="show-more-button">
-                    Mostra altri ${data.length - 5} record
-                </button>
-            </td>
-        `;
-                forexTable.appendChild(showMoreRow);
-            }
         }
-
-        // Funzioni di supporto
         function formatNumber(num) {
             return num.toFixed(4);
         }
-
         function formatDate(dateStr) {
             const date = new Date(dateStr);
             return date.toLocaleDateString('it-IT', {
                 year: 'numeric',
                 month: '2-digit',
-                day: '2-digit'
+                day: '2-digit',
             });
         }
-
         function updateChart(data) {
             const ctx = document.getElementById('forexChart').getContext('2d');
 
@@ -289,36 +292,78 @@
                 window.chartInstance.destroy();
             }
 
+            const candleData = data.map(row => ({
+                x: new Date(row.giorno).getTime(),
+                o: row.open,
+                h: row.massimo,
+                l: row.minimo,
+                c: row.close
+            })).reverse();
+
             window.chartInstance = new Chart(ctx, {
-                type: 'line',
+                type: 'candlestick',
                 data: {
-                    labels: data.map(row => row.giorno).reverse(),
-                    datasets: [
-                        {
-                            label: 'Prezzo di Chiusura',
-                            data: data.map(row => row.close).reverse(),
-                            borderColor: 'rgb(75, 192, 192)',
-                            tension: 0.1
+                    datasets: [{
+                        label: 'OHLC',
+                        data: candleData,
+                        color: {
+                            up: '#26a69a',
+                            down: '#ef5350',
+                        },
+                        borderColor: {
+                            up: '#26a69a',
+                            down: '#ef5350',
+                        },
+                        backgroundColor: {
+                            up: 'rgba(38, 166, 154, 0.3)',
+                            down: 'rgba(239, 83, 80, 0.3)'
                         }
-                    ]
+                    }]
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Andamento Prezzo'
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day',
+                                displayFormats: {
+                                    day: 'dd MMM'
+                                }
+                            },
+                            ticks: {
+                                source: 'data'
+                            }
+                        },
+                        y: {
+                            position: 'right',
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
                         }
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: false
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Grafico Candele',
+                            color: '#fff',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            right: 20
                         }
                     }
                 }
             });
         }
-
         function openTradeModal(currency, price) {
             const modal = document.getElementById('tradeModal');
             document.getElementById('modalCurrencyPair').textContent = currency;
@@ -328,22 +373,21 @@
             document.getElementById('modalCapital').textContent =
                 document.getElementById('capital').textContent.split(': ')[1];
 
-            modal.style.display = 'flex';
+            const bootstrapModal = new bootstrap.Modal(modal);
+            bootstrapModal.show();
 
-            // Aggiorna il totale quando cambia la quantità
             document.getElementById('modalAmount').addEventListener('input', updateModalTotal);
         }
-
         function updateModalTotal() {
             const amount = parseFloat(document.getElementById('modalAmount').value) || 0;
             const price = parseFloat(document.getElementById('modalCurrentPrice').textContent);
             document.getElementById('modalTotal').textContent = `${(amount * price).toFixed(2)} €`;
         }
-
         function closeTradeModal() {
-            document.getElementById('tradeModal').style.display = 'none';
+            const modal = document.getElementById('tradeModal');
+            const bootstrapModal = bootstrap.Modal.getInstance(modal);
+            bootstrapModal.hide();
         }
-
         function confirmTrade() {
             const tradeData = {
                 currency_pair: document.getElementById('modalCurrencyPair').textContent,
@@ -351,7 +395,6 @@
                 amount: parseFloat(document.getElementById('modalAmount').value),
                 price: parseFloat(document.getElementById('modalCurrentPrice').textContent)
             };
-
             fetch('/api/trade', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -375,7 +418,6 @@
                     closeTradeModal();
                 });
         }
-
         function logout() {
             fetch('/logout', { method: 'POST' })
                 .then(response => response.json())
@@ -384,6 +426,8 @@
                         localStorage.removeItem('nome');
                         localStorage.removeItem('capitale');
                         window.location.href = '/';
+                    } else {
+                        alert('Errore durante il logout');
                     }
                 })
                 .catch(error => {
@@ -393,5 +437,4 @@
         }
     </script>
 </body>
-
 </html>
